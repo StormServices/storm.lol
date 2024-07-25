@@ -1,4 +1,9 @@
--- getting custom tabs
+-- ESP Features
+local NameESP = true
+local BoxESP = true
+local GlowESP = true
+
+-- Getting custom tabs
 readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
 
 local Decimals = 4
@@ -6,7 +11,7 @@ local Clock = os.clock()
 local ValueText = "Value Is Now :"
 local notMade = "Error, contact staff."
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/lib.lua"))({
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/StormLibrary.lua"))({
     cheatname = "storm.lol", -- watermark text
     gamename = game.Name, -- watermark text
 })
@@ -15,8 +20,8 @@ library:init()
 
 local Window1  = library.NewWindow({
     title = "storm.lol | dev version", -- Mainwindow Text
-    size = UDim2.new(0, 510, 0.6, 6
-)})
+    size = UDim2.new(0, 510, 0.6, 6)
+})
 
 if game.PlaceId == counterBloxId then createCBtab() end
 local Tab1 = Window1:AddTab("   Legit   ")
@@ -42,12 +47,7 @@ after it, grab to another location or just stomp and instant tp to safe location
 
 local ESP = Tab3:AddSection("ESP", 1)
 local LocalEsp = Tab3:AddSection("Local", 2)
-local Chams = Tab3:AddSection("Chams", 3)
-local Tracer = Tab3:AddSection("Tracer", 4)
-local Items = Tab3:AddSection("Items", 5)
-local Locations = Tab3:AddSection("Locations", 6)
-local PlrAvatar = Tab3:AddSection("Avatar", 7)
-local Gun = Tab4:AddSection("Gun Visuals", 8) -- bullet tracer
+
 
 local Desync = Tab4:AddSection("Desync", 1)
 local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
@@ -165,315 +165,164 @@ end})
 LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = false, max = 4, values = {"HP", "IHP", "TP"}, risky = true, callback = function(v)
     resetMethod = v
 end})
-LPlayer:AddSlider({enabled = true, text = "HP Timing", tooltip = "How long will take for it to be 0", flag = "Slider_1", suffix = "", dragging = true, focused = false, min = 0, max = 10, increment = 0.1, risky = false, callback = function(v)
-    HPtiming = v
+LPlayer:AddBind({enabled = true, text = "Reset Bind", mode = "toggle", bind = "Mouse", flag = "resetBind", state = false, nomouse = false, noindicator = false, callback = function(v)
+    bind = v
 end})
 
-local screenWidth = workspace.CurrentCamera.ViewportSize.X
-local screenHeight = workspace.CurrentCamera.ViewportSize.Y
-
-LFov:AddToggle({text = "Show FOV", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
-        if v then
-            fovCircle = Drawing.new("Circle")
-            fovCircle.Visible = true
-            fovCircle.Name = "FOVCircle"
-            fovCircle.Thickness = fovThickness
-            fovCircle.Transparency = fovTransparency
-            fovCircle.Color = fovColor
-            fovCircle.Radius = fovRadius
-            fovCircle.Position = Vector2.new(screenWidth / 2, screenHeight / 2)
-        else
-            if fovCircle then
-                fovCircle.Visible = false
-            end
-        end
-    end
-})
-
-LFov:AddColor({enabled = true, text = "FOV Color", tooltip = "", color = Color3.fromRGB(255, 255, 255), flag = "", trans = 0, open = false, risky = false, callback = function(v)
-        fovColor = v
-        if fovCircle then
-            fovCircle.Color = fovColor
-        end
-    end
-})
-
-LFov:AddSlider({enabled = true, text = "FOV Radius", tooltip = "", min = 10, max = 200, value = 100, flag = "", risky = false, callback = function(v)
-        fovRadius = v
-        if fovCircle then
-            fovCircle.Radius = fovRadius
-        end
-    end
-})
-
-LFov:AddSlider({enabled = true, text = "FOV Transparency", tooltip = "", min = 0, max = 1, value = 1, flag = "", risky = false, callback = function(v)
-        fovTransparency = v
-        if fovCircle then
-            fovCircle.Transparency = fovTransparency
-        end
-    end
-})
-
-LFov:AddSlider({enabled = true, text = "FOV Thickness", tooltip = "", min = 1, max = 10, value = 1, flag = "", risky = false, callback = function(v)
-        fovThickness = v
-        if fovCircle then
-            fovCircle.Thickness = fovThickness
-        end
-    end
-})
-
-AimCfg:AddToggle({text = "Prediction", state = false, risky = false, tooltip = "Prediction for games with delay on shoot", flag = "", risky = false, callback = function(v)
-    predStatus = v
-end})
-AimCfg:AddBox({enabled = true, name = "Prediction Amount", flag = "TextBox_1", input = "", focused = true, risky = false, callback = function(v)
-    predValue = v
-end})
-AimCfg:AddSlider({enabled = true, text = "Smoothness", tooltip = "", min = 1, max = 10, value = 5, flag = "", risky = false, callback = function(v)
-    smoothness = v
-end})
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
-local camera = Workspace.CurrentCamera
-
-local moveVector = Vector3.new(0, 0, 0)
-local isSpeedActive = false
-local speedValue = 16
-local jumpPower = 50
-local speedMode = "Normal"
-local speedDelayTick = 0
-local oldWalkSpeed = nil
-local w, a, s, d = 0, 0, 0, 0
-local enableSpeed = false
-local speedToggle = false
-local autoJumpToggle = false
-
-local function calculateMoveVector(direction)
-    local camCFrame = camera.CFrame
-    local moveDirection = (camCFrame - camCFrame.p) * direction
-    moveDirection = Vector3.new(moveDirection.X, 0, moveDirection.Z).Unit
-    return moveDirection
-end
-
-local function stopMovement()
-    moveVector = Vector3.new(0, 0, 0)
-    if humanoidRootPart then
-        humanoidRootPart.Velocity = Vector3.new(0, humanoidRootPart.Velocity.Y, 0)
-    end
-    if humanoid then
-        humanoid:Move(Vector3.new(0, 0, 0), true)
-    end
-end
-
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent or not enableSpeed then return end
-
-    if input.KeyCode == Enum.KeyCode.W then
-        w = -1
-    elseif input.KeyCode == Enum.KeyCode.A then
-        a = -1
-    elseif input.KeyCode == Enum.KeyCode.S then
-        s = 1
-    elseif input.KeyCode == Enum.KeyCode.D then
-        d = 1
-    end
-
-    if w ~= 0 or a ~= 0 or s ~= 0 or d ~= 0 then
-        isSpeedActive = true
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent or not enableSpeed then return end
-
-    if input.KeyCode == Enum.KeyCode.W then
-        w = 0
-    elseif input.KeyCode == Enum.KeyCode.A then
-        a = 0
-    elseif input.KeyCode == Enum.KeyCode.S then
-        s = 0
-    elseif input.KeyCode == Enum.KeyCode.D then
-        d = 0
-    end
-
-    if w == 0 and a == 0 and s == 0 and d == 0 then
-        isSpeedActive = false
-        stopMovement()
-    end
-end)
-
-local function moveCharacter(delta)
-    if isSpeedActive and enableSpeed and character and humanoidRootPart then
-        local movevec = calculateMoveVector(Vector3.new(a + d, 0, w + s))
-        if movevec.Magnitude == 0 then
-            return
-        end
-
-        if speedMode == "Velocity" then
-            local currentVelocity = humanoidRootPart.Velocity
-            local newVelocity = movevec * speedValue
-            humanoidRootPart.Velocity = Vector3.new(newVelocity.X, currentVelocity.Y, newVelocity.Z)
-        elseif speedMode == "CFrame" then
-            humanoidRootPart.CFrame = humanoidRootPart.CFrame + movevec * (speedValue * delta)
-        elseif speedMode == "Tp" then
-            if speedDelayTick <= tick() then
-                speedDelayTick = tick() + 0.1
-                local newpos = movevec * (speedValue / 10)
-                humanoidRootPart.CFrame = humanoidRootPart.CFrame + newpos
-            end
-        elseif speedMode == "Normal" then
-            if oldWalkSpeed == nil then
-                oldWalkSpeed = humanoid.WalkSpeed
-            end
-            humanoid.WalkSpeed = speedValue
-            humanoid:MoveTo(humanoidRootPart.Position + movevec * speedValue * delta)
-        end
-
-        if autoJumpToggle and isSpeedActive then
-            local ray = Ray.new(humanoidRootPart.Position, Vector3.down)
-            local rayResult = workspace:FindPartOnRay(ray)
-            if rayResult == nil then
-                humanoid.Humanoid.JumpPower = jumpPower
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end
-    elseif not isSpeedActive then
-        stopMovement()
-    end
-end
-
-local function toggleSpeed()
-    isSpeedActive = not isSpeedActive
-    if isSpeedActive then
-        enableSpeed = true
-    else
-        enableSpeed = false
-    end
-end
-
-local moveCharacterConnection
-local function bindMovement()
-    if moveCharacterConnection then
-        moveCharacterConnection:Disconnect()
-    end
-    moveCharacterConnection = RunService.Heartbeat:Connect(moveCharacter)
-end
-
-local function unbindMovement()
-    if moveCharacterConnection then
-        moveCharacterConnection:Disconnect()
-        moveCharacterConnection = nil
-    end
-end
-
-player.CharacterAdded:Connect(function(char)
-    character = char
-    humanoidRootPart = char:WaitForChild("HumanoidRootPart")
-    humanoid = char:WaitForChild("Humanoid")
-    isSpeedActive = false
-    w, a, s, d = 0, 0, 0, 0
-    stopMovement()
-    bindMovement()
-end)
-
-bindMovement()
-
---[[
-Player:AddSlider({enabled = true, text = "Speed", tooltip = "", flag = "plrSpeed", suffix = "", dragging = true, focused = false, min = 0, max = 100, increment = 0.1, risky = false, callback = function(v)
-    speedValue = v
-end})
-Player:AddList({enabled = true, text = "Mode", tooltip = "", selected = "Normal", multi = false, open = false, max = 4, values = {"Velocity", "CFrame", "Normal", "Tp"}, risky = false, callback = function(v)
-    speedMode = v
-end})
-Player:AddToggle({enabled = true, text = "Enable Speed", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
+LFov:AddToggle({enabled = true, text = "Enable Fov", state = false, risky = false, tooltip = "", flag = "fovEnable", risky = false, callback = function(v)
     if v then
-        toggleSpeed()
-    end
-end})
-Player:AddToggle({enabled = true, text = "Auto Jump", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
-    autoJumpToggle = v
-end})
---]]
-Player:AddSeparator({enabled = true, text = "Speed currently disabled."})
-LocalEsp:AddSlider({enabled = true, text = "Field Of View ( FOV )", tooltip = "", flag = "Slider_1", suffix = "", dragging = true, focused = false, min = 0, max = 120, increment = 0.1, risky = false, callback = function(v)
-    if cameraFovEnabled == true then
-        game:GetService('Workspace').Camera.FieldOfView = v
-    end
-end})
-LocalEsp:AddToggle({text = "Enable Field Of View ( FOV )", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
-    cameraFovEnabled = v
-    if v == false then
-        game:GetService('Workspace').Camera.FieldOfView = 70
-    end
-end})
-LocalEsp:AddSeparator({enabled = true, text = "Normal FOV: 70"})
+        local player = game.Players.LocalPlayer
+        local camera = game.Workspace.CurrentCamera
+        local aimingFov = fovRadius
+        local fovCircle = Drawing.new("Circle")
+        fovCircle.Thickness = 2
+        fovCircle.Radius = aimingFov
+        fovCircle.Transparency = 0.7
+        fovCircle.Color = Color3.fromRGB(255, 0, 0)
+        fovCircle.Visible = true
 
-PlrStuff:AddToggle({text = "Tp if hp is low", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(hpToggle)
-    if hpToggle == true  then
-        humanoid.HealthChanged:Connect(onHealthChanged)
-    else
-        humanoid.HealthChanged:Disconnect(onHealthChanged)
-    end
-end})
-PlrStuff:AddSlider({enabled = true, text = "HP Amount", tooltip = "", flag = "Slider_1", suffix = "", dragging = true, focused = false, min = 0, max = 100, increment = 0.1, risky = false, callback = function(v)
-    healthThreshold = v
-end})
-
-Misc:AddToggle({text = "Freecam", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(callback)
-    if callback then
-        local cameraCFrame = gameCamera.CFrame
-        local pitch, yaw, roll = cameraCFrame:ToEulerAnglesYXZ()
-        cameraRot = Vector2.new(pitch, yaw)
-        cameraPos = cameraCFrame.p
-        cameraFov = gameCamera.FieldOfView
-
-        velSpring:Reset(Vector3.zero)
-        panSpring:Reset(Vector2.new())
-
-        playerstate.Push()
-        RunLoops:BindToRenderStep("Freecam", function(dt)
-            local vel = velSpring:Update(dt, Input.Vel(dt))
-            local pan = panSpring:Update(dt, Input.Pan(dt))
-
-            local zoomFactor = math.sqrt(math.tan(math.rad(70/2))/math.tan(math.rad(cameraFov/2)))
-
-            cameraRot = cameraRot + pan*Vector2.new(0.75, 1)*8*(dt/zoomFactor)
-            cameraRot = Vector2.new(math.clamp(cameraRot.x, -math.rad(90), math.rad(90)), cameraRot.y%(2*math.pi))
-
-            local cameraCFrame = CFrame.new(cameraPos)*CFrame.fromOrientation(cameraRot.x, cameraRot.y, 0)*CFrame.new(vel*Vector3.new(1, 1, 1)*64*dt)
-            cameraPos = cameraCFrame.p
-
-            gameCamera.CFrame = cameraCFrame
-            gameCamera.Focus = cameraCFrame*CFrame.new(0, 0, -GetFocusDistance(cameraCFrame))
-            gameCamera.FieldOfView = cameraFov
+        RunService.RenderStepped:Connect(function()
+            local mouseLocation = UserInputService:GetMouseLocation()
+            fovCircle.Position = Vector2.new(mouseLocation.X, mouseLocation.Y + 36)
+            fovCircle.Visible = true
         end)
-        Input.StartCapture()
     else
-        Input.StopCapture()
-        RunLoops:UnbindFromRenderStep("Freecam")
-        playerstate.Pop()
+        fovCircle.Visible = false
     end
-end}):AddBind({enabled = true, text = "Test", tooltip = "tooltip1", mode = "toggle", bind = "None", flag = "ToggleKey_1", state = false, nomouse = false, risky = false, noindicator = false, callback = function(v)
-    print(ValueText, v)
-end, keycallback = function(v)
-    print(ValueText, v) end
-})
+end})
+LFov:AddSlider({enabled = true, text = "Fov Size", tooltip = "", flag = "fovSize", suffix = "", dragging = true, focused = false, min = 0, max = 300, value = 150, increment = 0.1, risky = false, callback = function(v)
+    fovRadius = v
+end})
 
-local Time = (string.format("%."..tostring(Decimals).."f", os.clock() - Clock))
-library:SendNotification(("Loaded In "..tostring(Time)), 6)
-    
---[[
-    Window1:SetOpen(false)
-    makefolder("Title Here")
-    library:SetTheme(Default)
-    library:GetConfig(Default)
-    library:LoadConfig(Default)
-    library:SaveConfig(Default)
-]]
+-- Add ESP Toggle
+ESP:AddToggle({text = "ESP", state = true, risky = false, tooltip = "", flag = "Toggle_ESP", risky = false, callback = function(v)
+    if v then
+        NameESP = true
+        BoxESP = true
+        GlowESP = true
+    else
+        NameESP = false
+        BoxESP = false
+        GlowESP = false
+        -- Cleanup any existing ESP elements
+        for _, player in pairs(Players:GetPlayers()) do
+            if player:FindFirstChild("NameEsp") then
+                player.NameEsp:Destroy()
+            end
+            if player:FindFirstChild("BoxEsp") then
+                player.BoxEsp:Destroy()
+            end
+            if player:FindFirstChild("GlowEsp") then
+                player.GlowEsp:Destroy()
+            end
+        end
+    end
+end})
+
+-- Name ESP
+ESP:AddToggle({text = "Name ESP", state = true, risky = false, tooltip = "", flag = "Toggle_NameESP", risky = false, callback = function(v)
+    NameESP = v
+    if not v then
+        -- Remove existing name ESP labels
+        for _, player in pairs(Players:GetPlayers()) do
+            if player:FindFirstChild("NameEsp") then
+                player.NameEsp:Destroy()
+            end
+        end
+    end
+end})
+
+-- Box ESP
+ESP:AddToggle({text = "Box ESP", state = true, risky = false, tooltip = "", flag = "Toggle_BoxESP", risky = false, callback = function(v)
+    BoxESP = v
+    if not v then
+        -- Remove existing box ESP rectangles
+        for _, player in pairs(Players:GetPlayers()) do
+            if player:FindFirstChild("BoxEsp") then
+                player.BoxEsp:Destroy()
+            end
+        end
+    end
+end})
+
+-- Glow ESP
+ESP:AddToggle({text = "Glow ESP", state = true, risky = false, tooltip = "", flag = "Toggle_GlowESP", risky = false, callback = function(v)
+    GlowESP = v
+    if not v then
+        -- Remove existing glow ESP highlights
+        for _, player in pairs(Players:GetPlayers()) do
+            if player:FindFirstChild("GlowEsp") then
+                player.GlowEsp:Destroy()
+            end
+        end
+    end
+end})
+
+-- Update ESP elements continuously
+RunService.RenderStepped:Connect(function()
+    if NameESP or BoxESP or GlowESP then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local character = player.Character
+                local rootPart = character.HumanoidRootPart
+                local head = character:FindFirstChild("Head")
+
+                -- Name ESP
+                if NameESP then
+                    if not player:FindFirstChild("NameEsp") then
+                        local nameBillboard = Instance.new("BillboardGui", player)
+                        nameBillboard.Name = "NameEsp"
+                        nameBillboard.Adornee = head
+                        nameBillboard.Size = UDim2.new(0, 100, 0, 20)
+                        nameBillboard.StudsOffset = Vector3.new(0, 2, 0)
+                        nameBillboard.AlwaysOnTop = true
+                        local nameLabel = Instance.new("TextLabel", nameBillboard)
+                        nameLabel.Size = UDim2.new(1, 0, 1, 0)
+                        nameLabel.BackgroundTransparency = 1
+                        nameLabel.Text = player.Name
+                        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        nameLabel.TextStrokeTransparency = 0.5
+                    end
+                else
+                    if player:FindFirstChild("NameEsp") then
+                        player.NameEsp:Destroy()
+                    end
+                end
+
+                -- Box ESP
+                if BoxESP then
+                    if not player:FindFirstChild("BoxEsp") then
+                        local box = Instance.new("BoxHandleAdornment", player)
+                        box.Name = "BoxEsp"
+                        box.Adornee = character
+                        box.Size = character:GetExtentsSize()
+                        box.Transparency = 0.5
+                        box.Color3 = Color3.fromRGB(255, 0, 0)
+                        box.AlwaysOnTop = true
+                        box.ZIndex = 5
+                    end
+                else
+                    if player:FindFirstChild("BoxEsp") then
+                        player.BoxEsp:Destroy()
+                    end
+                end
+
+                -- Glow ESP
+                if GlowESP then
+                    if not player:FindFirstChild("GlowEsp") then
+                        local highlight = Instance.new("Highlight", player)
+                        highlight.Name = "GlowEsp"
+                        highlight.FillTransparency = 0.5
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlight.OutlineTransparency = 0
+                    end
+                else
+                    if player:FindFirstChild("GlowEsp") then
+                        player.GlowEsp:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end)
