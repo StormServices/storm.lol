@@ -2,6 +2,8 @@
 local NameESP = false
 local BoxESP = false
 local GlowESP = false
+local SpinbotEnabled = false
+local SpinbotSpeed = 50
 
 -- Getting custom tabs
 readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
@@ -41,9 +43,6 @@ local AimCfg = Tab1:AddSection("Config", 5)
 
 local sAim = Tab2:AddSection("Silent Aim", 1)
 local Player = Tab2:AddSection("Player", 2) -- make fly
-local RFov = Tab2:AddSection("FOV", 3)
-local Killer = Tab2:AddSection("Killer", 4) --[[ basically will fly around player with a fast movement to try killing it,
-after it, grab to another location or just stomp and instant tp to safe location]]
 
 local ESP = Tab3:AddSection("Enemies", 1)
 local LocalEsp = Tab3:AddSection("Local", 2)
@@ -167,6 +166,19 @@ RunService.RenderStepped:Connect(function()
     UpdateBoxESP()
 end)
 
+--// Spinbot Function
+local function Spinbot()
+    while SpinbotEnabled do
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.Humanoid.AutoRotate = false
+            LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinbotSpeed), 0)
+        else
+            LocalPlayer.Character.Humanoid.AutoRotate = true
+        end
+        task.wait()
+    end
+end
+
 --// Toggle Features
 ESP:AddToggle({
     text = "Name Esp",
@@ -212,6 +224,34 @@ ESP:AddToggle({
     flag = "GlowESP",
     callback = function(v)
         GlowESP = v
+    end
+})
+
+-- Add Spinbot toggle and slider
+Player:AddToggle({
+    text = "Spinbot",
+    state = false,
+    risky = false,
+    tooltip = "Enable or disable Spinbot.",
+    flag = "Spinbot",
+    callback = function(v)
+        SpinbotEnabled = v
+        if v then
+            task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
+        end
+    end
+})
+
+Player:AddSlider({
+    text = "Spinbot Speed",
+    tooltip = "Adjust the speed of the Spinbot.",
+    flag = "SpinbotSpeed",
+    min = 1,
+    max = 100,
+    value = SpinbotSpeed,
+    increment = 1,
+    callback = function(v)
+        SpinbotSpeed = v
     end
 })
 
@@ -458,4 +498,3 @@ LPlayer:AddList({
 })
 
 -- Additional Functions or Code for other sections...
-
