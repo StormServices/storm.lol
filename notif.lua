@@ -1,0 +1,3 @@
+function warn(message)
+    
+end
