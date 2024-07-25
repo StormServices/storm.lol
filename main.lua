@@ -6,7 +6,7 @@ local Clock = os.clock()
 local ValueText = "Value Is Now :"
 local notMade = "Error, contact staff."
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/drillygzzly/Roblox-UI-Libs/main/1%20Tokyo%20Lib%20(FIXED)/Tokyo%20Lib%20Source.lua"))({
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/lib"))({
     cheatname = "storm.lol", -- watermark text
     gamename = game.Name, -- watermark text
 })
