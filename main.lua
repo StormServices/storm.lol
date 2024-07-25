@@ -1,7 +1,7 @@
 -- ESP Features
-local NameESP = true
-local BoxESP = true
-local GlowESP = true
+local NameESP = false
+local BoxESP = false
+local GlowESP = false
 
 -- Getting custom tabs
 readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
@@ -45,9 +45,8 @@ local RFov = Tab2:AddSection("FOV", 3)
 local Killer = Tab2:AddSection("Killer", 4) --[[ basically will fly around player with a fast movement to try killing it,
 after it, grab to another location or just stomp and instant tp to safe location]]
 
-local ESP = Tab3:AddSection("ESP", 1)
+local ESP = Tab3:AddSection("Enemies", 1)
 local LocalEsp = Tab3:AddSection("Local", 2)
-
 
 local Desync = Tab4:AddSection("Desync", 1)
 local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
@@ -162,167 +161,63 @@ LPlayer:AddButton({enabled = true, text = "Reset", tooltip = "Reset if game does
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -999999999, 0)
     end
 end})
-LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = false, max = 4, values = {"HP", "IHP", "TP"}, risky = true, callback = function(v)
+-- Continuation of script
+LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = true, max = 3, values = {"HP", "IHP", "TP"}, risky = false, callback = function(v)
     resetMethod = v
 end})
-LPlayer:AddBind({enabled = true, text = "Reset Bind", mode = "toggle", bind = "Mouse", flag = "resetBind", state = false, nomouse = false, noindicator = false, callback = function(v)
-    bind = v
-end})
 
-LFov:AddToggle({enabled = true, text = "Enable Fov", state = false, risky = false, tooltip = "", flag = "fovEnable", risky = false, callback = function(v)
-    if v then
-        local player = game.Players.LocalPlayer
-        local camera = game.Workspace.CurrentCamera
-        local aimingFov = fovRadius
-        local fovCircle = Drawing.new("Circle")
-        fovCircle.Thickness = 2
-        fovCircle.Radius = aimingFov
-        fovCircle.Transparency = 0.7
-        fovCircle.Color = Color3.fromRGB(255, 0, 0)
-        fovCircle.Visible = true
+--// Glow ESP
+local ESPSettings = {
+    ChamsColor = Color3.fromRGB(200, 200, 200), -- Default Chams Color
+}
 
-        RunService.RenderStepped:Connect(function()
-            local mouseLocation = UserInputService:GetMouseLocation()
-            fovCircle.Position = Vector2.new(mouseLocation.X, mouseLocation.Y + 36)
-            fovCircle.Visible = true
-        end)
-    else
-        fovCircle.Visible = false
-    end
-end})
-LFov:AddSlider({enabled = true, text = "Fov Size", tooltip = "", flag = "fovSize", suffix = "", dragging = true, focused = false, min = 0, max = 300, value = 150, increment = 0.1, risky = false, callback = function(v)
-    fovRadius = v
-end})
-
--- Add ESP Toggle
-ESP:AddToggle({text = "ESP", state = true, risky = false, tooltip = "", flag = "Toggle_ESP", risky = false, callback = function(v)
-    if v then
-        NameESP = true
-        BoxESP = true
-        GlowESP = true
-    else
-        NameESP = false
-        BoxESP = false
-        GlowESP = false
-        -- Cleanup any existing ESP elements
-        for _, player in pairs(Players:GetPlayers()) do
-            if player:FindFirstChild("NameEsp") then
-                player.NameEsp:Destroy()
-            end
-            if player:FindFirstChild("BoxEsp") then
-                player.BoxEsp:Destroy()
-            end
-            if player:FindFirstChild("GlowEsp") then
-                player.GlowEsp:Destroy()
+function UpdateGlowESP()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+            local Highlight = player.Character:FindFirstChild("Highlight")
+            
+            if GlowESP then
+                if Highlight then
+                    if player.TeamColor then
+                        Highlight.FillColor = player.TeamColor.Color
+                    else
+                        Highlight.FillColor = ESPSettings.ChamsColor
+                    end
+                else
+                    Highlight = Instance.new("Highlight", player.Character)
+                    if player.TeamColor then
+                        Highlight.FillColor = player.TeamColor.Color
+                    else
+                        Highlight.FillColor = ESPSettings.ChamsColor
+                    end
+                end
+            else
+                if Highlight then
+                    Highlight:Destroy()
+                end
             end
         end
     end
-end})
+end
 
--- Name ESP
-ESP:AddToggle({text = "Name ESP", state = true, risky = false, tooltip = "", flag = "Toggle_NameESP", risky = false, callback = function(v)
-    NameESP = v
-    if not v then
-        -- Remove existing name ESP labels
-        for _, player in pairs(Players:GetPlayers()) do
-            if player:FindFirstChild("NameEsp") then
-                player.NameEsp:Destroy()
-            end
-        end
-    end
-end})
-
--- Box ESP
-ESP:AddToggle({text = "Box ESP", state = true, risky = false, tooltip = "", flag = "Toggle_BoxESP", risky = false, callback = function(v)
-    BoxESP = v
-    if not v then
-        -- Remove existing box ESP rectangles
-        for _, player in pairs(Players:GetPlayers()) do
-            if player:FindFirstChild("BoxEsp") then
-                player.BoxEsp:Destroy()
-            end
-        end
-    end
-end})
-
--- Glow ESP
-ESP:AddToggle({text = "Glow ESP", state = true, risky = false, tooltip = "", flag = "Toggle_GlowESP", risky = false, callback = function(v)
-    GlowESP = v
-    if not v then
-        -- Remove existing glow ESP highlights
-        for _, player in pairs(Players:GetPlayers()) do
-            if player:FindFirstChild("GlowEsp") then
-                player.GlowEsp:Destroy()
-            end
-        end
-    end
-end})
-
--- Update ESP elements continuously
+-- Update Glow ESP continuously
 RunService.RenderStepped:Connect(function()
-    if NameESP or BoxESP or GlowESP then
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local character = player.Character
-                local rootPart = character.HumanoidRootPart
-                local head = character:FindFirstChild("Head")
-
-                -- Name ESP
-                if NameESP then
-                    if not player:FindFirstChild("NameEsp") then
-                        local nameBillboard = Instance.new("BillboardGui", player)
-                        nameBillboard.Name = "NameEsp"
-                        nameBillboard.Adornee = head
-                        nameBillboard.Size = UDim2.new(0, 100, 0, 20)
-                        nameBillboard.StudsOffset = Vector3.new(0, 2, 0)
-                        nameBillboard.AlwaysOnTop = true
-                        local nameLabel = Instance.new("TextLabel", nameBillboard)
-                        nameLabel.Size = UDim2.new(1, 0, 1, 0)
-                        nameLabel.BackgroundTransparency = 1
-                        nameLabel.Text = player.Name
-                        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        nameLabel.TextStrokeTransparency = 0.5
-                    end
-                else
-                    if player:FindFirstChild("NameEsp") then
-                        player.NameEsp:Destroy()
-                    end
-                end
-
-                -- Box ESP
-                if BoxESP then
-                    if not player:FindFirstChild("BoxEsp") then
-                        local box = Instance.new("BoxHandleAdornment", player)
-                        box.Name = "BoxEsp"
-                        box.Adornee = character
-                        box.Size = character:GetExtentsSize()
-                        box.Transparency = 0.5
-                        box.Color3 = Color3.fromRGB(255, 0, 0)
-                        box.AlwaysOnTop = true
-                        box.ZIndex = 5
-                    end
-                else
-                    if player:FindFirstChild("BoxEsp") then
-                        player.BoxEsp:Destroy()
-                    end
-                end
-
-                -- Glow ESP
-                if GlowESP then
-                    if not player:FindFirstChild("GlowEsp") then
-                        local highlight = Instance.new("Highlight", player)
-                        highlight.Name = "GlowEsp"
-                        highlight.FillTransparency = 0.5
-                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                        highlight.OutlineTransparency = 0
-                    end
-                else
-                    if player:FindFirstChild("GlowEsp") then
-                        player.GlowEsp:Destroy()
-                    end
-                end
-            end
-        end
-    end
+    UpdateGlowESP()
 end)
+
+--// Toggle Features
+ESP:AddToggle({text = "Name Esp", state = false, risky = false, tooltip = "", flag = "NameESP", callback = function(v)
+    NameESP = v
+    -- Implement logic to handle Name ESP toggling
+end})
+
+ESP:AddToggle({text = "Box Esp", state = false, risky = false, tooltip = "", flag = "BoxESP", callback = function(v)
+    BoxESP = v
+    -- Implement logic to handle Box ESP toggling
+end})
+
+ESP:AddToggle({text = "Chams"", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
+    GlowESP = v
+end})
+
+-- Additional Functions or Code for other sections...
