@@ -4,7 +4,7 @@ readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.l
 local Decimals = 4
 local Clock = os.clock()
 local ValueText = "Value Is Now :"
-local notMade = "Contact me with the feature name that its not working, so i can make it, discord: w9o0"
+local notMade = "Error, contact staff."
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/drillygzzly/Roblox-UI-Libs/main/1%20Tokyo%20Lib%20(FIXED)/Tokyo%20Lib%20Source.lua"))({
     cheatname = "storm.lol", -- watermark text
@@ -102,23 +102,23 @@ end})
 Main:AddToggle({text = "Toggle", state = false, risky = false, tooltip = "", flag = "Toggle_1", risky = false, callback = function(v)
     print(notMade)
 end})
-Main:AddList({enabled = true, text = "Aim Part", tooltip = "", selected = "Head", multi = false, open = false, max = 4, values = {"Head", "HumanoidRootPart", "Torso"}, risky = true, callback = function(v)
+Main:AddList({enabled = true, text = "Aim Part", tooltip = "", selected = "Head", multi = false, open = false, max = 4, values = {"Head", "Neck", "Torso"}, risky = false, callback = function(v)
     targetPart = v
 end})
 Main:AddBind({enabled = true, text = "Lock Keybind", mode = "toggle", bind = "Mouse", flag = "ToggleKey_1", state = false, nomouse = false, noindicator = false, callback = function(v)
     bind = v
 end})
 Main:AddSeparator({enabled = true, text = "Checkers"})
-Main:AddToggle({text = "Wall", state = true, risky = false, tooltip = "Prevent from players behind the wall", flag = "wallCheck", risky = false, callback = function(v)
+Main:AddToggle({text = "Visible Check", state = true, risky = false, tooltip = "If enabled, assist will only work if not behind a wall/surface.", flag = "wallCheck", risky = false, callback = function(v)
     print(notMade) 
 end})
-Main:AddToggle({text = "Alive", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", risky = false, callback = function(v)
+Main:AddToggle({text = "Status Check", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", risky = false, callback = function(v)
     print(notMade)
 end})
-Main:AddToggle({text = "Friends", state = false, risky = false, tooltip = "Prevent locking on your friends", flag = "friendCheck", risky = false, callback = function(v)
+Main:AddToggle({text = "Whitelist", state = false, risky = false, tooltip = "Whitelist people away from the aimbot.", flag = "friendCheck", risky = false, callback = function(v)
     print(notMade)
 end})
-Main:AddList({enabled = true, text = "Friends Mode",  tooltip = "Please, put whitelist players on the Misc tab", selected = "", multi = false, open = false,max = 1, values = {"Friend list", "Whitelisted"}, risky = false, callback = function(v)
+Main:AddList({enabled = true, text = "Whitelist",  tooltip = "Whitelist Here", selected = "", multi = false, open = false,max = 1, values = {"Friend list", "Whitelisted"}, risky = false, callback = function(v)
     print(notMade)
 end})
 
