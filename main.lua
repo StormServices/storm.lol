@@ -216,7 +216,7 @@ ESP:AddToggle({text = "Box Esp", state = false, risky = false, tooltip = "", fla
     -- Implement logic to handle Box ESP toggling
 end})
 
-ESP:AddToggle({text = "Chams"", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
+ESP:AddToggle({text = "Glow Esp", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
     GlowESP = v
 end})
 
