@@ -6,7 +6,7 @@ local Clock = os.clock()
 local ValueText = "Value Is Now :"
 local notMade = "Error, contact staff."
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/lib"))({
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/lib.lua"))({
     cheatname = "storm.lol", -- watermark text
     gamename = game.Name, -- watermark text
 })
@@ -15,7 +15,7 @@ library:init()
 
 local Window1  = library.NewWindow({
     title = "storm.lol | dev version", -- Mainwindow Text
-    size = UDim2.new(0, 510, 0.6, 6
+    size = UDim2.new(0, 510, 0.6, 6 
 )})
 
 if game.PlaceId == counterBloxId then createCBtab() end
