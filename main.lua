@@ -15,7 +15,7 @@ library:init()
 
 local Window1  = library.NewWindow({
     title = "storm.lol | dev version", -- Mainwindow Text
-    size = UDim2.new(0, 510, 0.6, 6 
+    size = UDim2.new(0, 510, 0.6, 6
 )})
 
 if game.PlaceId == counterBloxId then createCBtab() end
