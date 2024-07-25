@@ -57,14 +57,11 @@ local PlrStuff = Tab5:AddSection("Player", 2) -- make tp/view/bring
 -- // Services
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-<<<<<<< HEAD
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- // Variables
 
-=======
->>>>>>> a8275421e1a283730be080668751bce991702251
 local Camera = workspace.CurrentCamera
 
 -- Variables
@@ -72,7 +69,6 @@ local LocalPlayer = Players.LocalPlayer
 local NameSize = 14 -- Default size for Name ESP
 local WorldToViewportPoint = Camera.WorldToViewportPoint
 
-<<<<<<< HEAD
 local CurrentCamera = Camera
 local WorldToViewportPoint = CurrentCamera.WorldToViewportPoint
 --------------------------------------------------------------------
@@ -171,8 +167,6 @@ LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will dec
 end})
 
 
-=======
->>>>>>> a8275421e1a283730be080668751bce991702251
 --// Glow ESP
 local ESPSettings = {
     ChamsColor = Color3.fromRGB(200, 200, 200), -- Default Chams Color
