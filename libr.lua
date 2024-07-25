@@ -4538,17 +4538,17 @@ themeSection:AddList({text = 'Presets', flag = 'preset_theme', values = themeStr
         setByPreset = false
     end}):Select('Default');
 
-    for i, v in pairs(library.theme) do
-        themeSection:AddColor({text = i, flag = i, color = library.theme[i], callback = function(c3)
-            library.theme[i] = c3
-            library:SetTheme(library.theme)
-            if not setByPreset and not setByConfig then 
-                library.options.preset_theme:Select('Custom')
-            end
-        end});
-    end
+for i, v in pairs(library.theme) do
+    themeSection:AddColor({text = i, flag = i, color = library.theme[i], callback = function(c3)
+        library.theme[i] = c3
+        library:SetTheme(library.theme)
+        if not setByPreset and not setByConfig then 
+            library.options.preset_theme:Select('Custom')
+        end
+    end});
+end
 
-    return settingsTab;
+return settingsTab;
 end
 
 getgenv().library = library
