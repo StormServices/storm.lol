@@ -56,14 +56,54 @@ local Misc = Tab5:AddSection("Misc", 1) -- idk
 local PlrStuff = Tab5:AddSection("Player", 2) -- make tp/view/bring
 --------------------------------------------------------------------
 
+-- Services
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+--// Variables
+
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local CurrentCamera = Camera
+local WorldToViewportPoint = CurrentCamera.WorldToViewportPoint
+--------------------------------------------------------------------
+
 Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", risky = false, callback = function(v)
-    aimbotEnabled = v
     if v then
-        aimbotLoop()
+        -- Aimbot code
+        while true do
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
+                    local character = player.Character
+                    local targetPosition = character[targetPart].Position
+                    local distance = (targetPosition - camera.CFrame.Position).Magnitude
+                    if distance < closestDistance and distance < fovRadius then
+                        closestDistance = distance
+                        closestPlayer = player
+                    end
+                end
+            end
+            if closestPlayer then
+                local targetPosition = closestPlayer.Character[targetPart].Position
+                local cameraPosition = camera.CFrame.Position
+                local direction = (targetPosition - cameraPosition).Unit
+                camera.CFrame = camera.CFrame:Lerp(CFrame.new(cameraPosition + direction * smoothness), 0.1)
+            end
+            wait()
+        end
     end
 end})
 Main:AddToggle({text = "Toggle", state = false, risky = false, tooltip = "", flag = "Toggle_1", risky = false, callback = function(v)
     print(notMade)
+end})
+Main:AddList({enabled = true, text = "Aim Part", tooltip = "", selected = "Head", multi = false, open = false, max = 4, values = {"Head", "HumanoidRootPart", "Torso"}, risky = true, callback = function(v)
+    targetPart = v
 end})
 Main:AddBind({enabled = true, text = "Lock Keybind", mode = "toggle", bind = "Mouse", flag = "ToggleKey_1", state = false, nomouse = false, noindicator = false, callback = function(v)
     bind = v
@@ -82,28 +122,28 @@ Main:AddList({enabled = true, text = "Friends Mode",  tooltip = "Please, put whi
     print(notMade)
 end})
 
-LPlayer:AddSlider({enabled = true, text = "Speed", tooltip = "", flag = "LegitplrSpeed", suffix = "", dragging = true, focused = false, min = 0, max = 60, increment = 0.1, risky = false, callback = function(v)
+LPlayer:AddSlider({enabled = true, text = "Speed", tooltip = "", flag = "LegitplrSpeed", suffix = "", dragging = true, focused = false, min = 0, max = 60, value = 16,  increment = 0.1, risky = false, callback = function(v)
     LegitspeedValue = v
 end})
-LPlayer:AddSlider({enabled = true, text = "Jump", tooltip = "", flag = "LegitplrJump", suffix = "", dragging = true, focused = false, min = 50, max = 500, increment = 0.1, risky = false, callback = function(v)
+LPlayer:AddSlider({enabled = true, text = "Jump", tooltip = "", flag = "LegitplrJump", suffix = "", dragging = true, focused = false, min = 0, max = 500, value = 50, increment = 0.1, risky = false, callback = function(v)
     LegitjumpValue = v
 end})
 LPlayer:AddToggle({enabled = true, text = "Enable Speed", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
     if v then
-        local plrSpeed = game.LocalPlayer.Character.Humanoid.WalkSpeed
-        local oldSpeed = speed.Value
-        local plrSpeed = LegitspeedValue
+        local speed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+        local oldSpeed = speed
+        speed = LegitspeedValue
     else
-        plrSpeed.Value = oldSpeed
+        speed = oldSpeed
     end
 end})
 LPlayer:AddToggle({enabled = true, text = "Enable Jump", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
     if v then
-        local plrJump = game.LocalPlayer.Character.Humanoid.JumpPower
-        local oldJump = jump.Value
-        local plrJump = LegitjumpValue
+        local jump = game.Players.LocalPlayer.Character.Humanoid.JumpPower
+        local oldJump = jump
+        jump = LegitjumpValue
     else
-        plrJump.Value = oldJump
+        jump = oldJump
     end
 end})
 LPlayer:AddButton({enabled = true, text = "Reset", tooltip = "Reset if game doesn't have reset enabled", confirm = true, risky = true, callback = function()
@@ -129,45 +169,67 @@ LPlayer:AddSlider({enabled = true, text = "HP Timing", tooltip = "How long will 
     HPtiming = v
 end})
 
+local screenWidth = workspace.CurrentCamera.ViewportSize.X
+local screenHeight = workspace.CurrentCamera.ViewportSize.Y
+
 LFov:AddToggle({text = "Show FOV", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
-    if v then
-        -- Create the FOV circle
-        fovCircle = Instance.new("UIRing")
-        fovCircle.Name = "FOVCircle"
-        fovCircle.Thickness = 2
-        fovCircle.Transparency = 0.5
-        fovCircle.Color = fovColor
-        fovCircle.Radius = fovRadius
-        fovCircle.Parent = game.StarterGui.ScreenGui
-    else
-        -- Remove the FOV circle
-        fovCircle:Destroy()
+        if v then
+            fovCircle = Drawing.new("Circle")
+            fovCircle.Visible = true
+            fovCircle.Name = "FOVCircle"
+            fovCircle.Thickness = fovThickness
+            fovCircle.Transparency = fovTransparency
+            fovCircle.Color = fovColor
+            fovCircle.Radius = fovRadius
+            fovCircle.Position = Vector2.new(screenWidth / 2, screenHeight / 2)
+        else
+            if fovCircle then
+                fovCircle.Visible = false
+            end
+        end
     end
-end})
+})
 
 LFov:AddColor({enabled = true, text = "FOV Color", tooltip = "", color = Color3.fromRGB(255, 255, 255), flag = "", trans = 0, open = false, risky = false, callback = function(v)
-    fovColor = v
-    if fovCircle then
-        fovCircle.Color = fovColor
+        fovColor = v
+        if fovCircle then
+            fovCircle.Color = fovColor
+        end
     end
-end})
+})
 
 LFov:AddSlider({enabled = true, text = "FOV Radius", tooltip = "", min = 10, max = 200, value = 100, flag = "", risky = false, callback = function(v)
-    fovRadius = v
-    if fovCircle then
-        fovCircle.Radius = fovRadius
+        fovRadius = v
+        if fovCircle then
+            fovCircle.Radius = fovRadius
+        end
     end
-end})
+})
 
-LFov:AddSlider({enabled = true, text = "Smoothness", tooltip = "", min = 1, max = 20, value = 5, flag = "", risky = false, callback = function(v)
-    smoothness = v
-end})
+LFov:AddSlider({enabled = true, text = "FOV Transparency", tooltip = "", min = 0, max = 1, value = 1, flag = "", risky = false, callback = function(v)
+        fovTransparency = v
+        if fovCircle then
+            fovCircle.Transparency = fovTransparency
+        end
+    end
+})
+
+LFov:AddSlider({enabled = true, text = "FOV Thickness", tooltip = "", min = 1, max = 10, value = 1, flag = "", risky = false, callback = function(v)
+        fovThickness = v
+        if fovCircle then
+            fovCircle.Thickness = fovThickness
+        end
+    end
+})
 
 AimCfg:AddToggle({text = "Prediction", state = false, risky = false, tooltip = "Prediction for games with delay on shoot", flag = "", risky = false, callback = function(v)
     predStatus = v
 end})
 AimCfg:AddBox({enabled = true, name = "Prediction Amount", flag = "TextBox_1", input = "", focused = true, risky = false, callback = function(v)
     predValue = v
+end})
+AimCfg:AddSlider({enabled = true, text = "Smoothness", tooltip = "", min = 1, max = 10, value = 5, flag = "", risky = false, callback = function(v)
+    smoothness = v
 end})
 
 local Players = game:GetService("Players")
@@ -343,12 +405,13 @@ Player:AddSeparator({enabled = true, text = "Speed currently disabled."})
 LocalEsp:AddSlider({enabled = true, text = "Field Of View ( FOV )", tooltip = "", flag = "Slider_1", suffix = "", dragging = true, focused = false, min = 0, max = 120, increment = 0.1, risky = false, callback = function(v)
     if cameraFovEnabled == true then
         game:GetService('Workspace').Camera.FieldOfView = v
-    else
-        game:GetService('Workspace').Camera.FieldOfView = 70
     end
 end})
 LocalEsp:AddToggle({text = "Enable Field Of View ( FOV )", state = false, risky = false, tooltip = "", flag = "", risky = false, callback = function(v)
     cameraFovEnabled = v
+    if v == false then
+        game:GetService('Workspace').Camera.FieldOfView = 70
+    end
 end})
 LocalEsp:AddSeparator({enabled = true, text = "Normal FOV: 70"})
 

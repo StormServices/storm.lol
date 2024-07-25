@@ -1,1 +1,1 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/thraxhvh/storm.lol/main/main.lua"))
+loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/main.lua"))
