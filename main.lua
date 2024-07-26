@@ -309,7 +309,29 @@ end})
 ESP:AddToggle({text = "Glow Esp", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
     GlowESP = v
 end})
+MiscPlayer:AddToggle({text = "TP Around the Map", state = false, risky = false, tooltip = "", flag = "", callback = function(v)
+    local teleportLocations = {
+        Vector3.new(0, 10, 0), -- Location 1
+        Vector3.new(500, 10, 0), -- Location 2
+        Vector3.new(100, 10, 0), -- Location 3
+        Vector3.new(1500, 10, 0), -- Location 4
+    }
 
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function teleport(location)
+        character.HumanoidRootPart.CFrame = CFrame.new(location)
+    end
+
+    tpLoop = v
+    while tpLoop do
+        for i, location in ipairs(teleportLocations) do
+            teleport(location)
+            wait()
+        end
+    end
+end})
 CbGuns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
