@@ -1,5 +1,7 @@
 function createCBtab()
 
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/StormLibrary.lua"))
+
 local CounterBlox = Window1:AddTab("   Counter Blox   ")
 
 local Aim = CounterBlox:AddSection("Aim", 1)
