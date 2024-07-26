@@ -11,7 +11,6 @@ readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/loadCustoms.lua')
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/safeLocation.lua')
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/speed.lua')
-readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/spinBot.lua')
 
 -- checks
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/checks/checker.lua')
