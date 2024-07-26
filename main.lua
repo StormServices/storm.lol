@@ -41,7 +41,7 @@ local LPlayer = Tab1:AddSection("Player", 3) -- make respawn for games who dont 
 local LFov = Tab1:AddSection("FOV", 4)
 local AimCfg = Tab1:AddSection("Config", 5)
 
-local sAim = Tab2:AddSection("Silent Aim", 1)
+local sAim = Tab2:AddSection("Rage", 1)
 local Player = Tab2:AddSection("Player", 2) -- make fly
 
 local ESP = Tab3:AddSection("Enemies", 1)
@@ -51,7 +51,7 @@ local Desync = Tab4:AddSection("Desync", 1)
 local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
 
 local Misc = Tab5:AddSection("Misc", 1) -- idk
-local PlrStuff = Tab5:AddSection("Player", 2) -- make tp/view/bring
+local MiscPlayer = Tab5:AddSection("Player", 2) -- make tp/view/bring
 --------------------------------------------------------------------
 
 -- Services
@@ -93,6 +93,7 @@ end
 RunService.RenderStepped:Connect(function()
     UpdateGlowESP()
 end)
+
 
 --// Name ESP
 local function UpdateNameESP()
@@ -416,6 +417,123 @@ LPlayer:AddSlider({
         LegitjumpValue = v
     end
 })
+
+MiscPlayer:AddToggle({
+    text = "CB:RO No Spread",
+    state = false,
+    risky = false,
+    tooltip = "Disable spread for all weapons.",
+    flag = "NoSpread",
+    callback = function(v)
+        if v then
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("Spread") then
+                    Weapon:FindFirstChild("Spread").Value = 0
+                end
+            end
+        else
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("Spread") then
+                    Weapon:FindFirstChild("Spread").Value = OriginalSpreadValues[Weapon.Name] or 1
+                end
+            end
+        end
+    end
+})
+
+MiscPlayer:AddToggle({
+    text = "CB:RO Instant Weapon Reload",
+    state = false,
+    risky = false,
+    tooltip = "Instantly reloads all weapons.",
+    flag = "InstantReload",
+    callback = function(v)
+        if v then
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("ReloadTime") then
+                    Weapon:FindFirstChild("ReloadTime").Value = 0.05
+                end
+            end
+        else
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("ReloadTime") then
+                    Weapon:FindFirstChild("ReloadTime").Value = OriginalReloadTimes[Weapon.Name] or 1
+                end
+            end
+        end
+    end
+})
+
+
+MiscPlayer:AddToggle({
+    text = "CB:RO Instant Equip",
+    state = false,
+    risky = false,
+    tooltip = "Instantly equips all weapons.",
+    flag = "InstantEquip",
+    callback = function(v)
+        if v then
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("EquipTime") then
+                    Weapon:FindFirstChild("EquipTime").Value = 0.05
+                end
+            end
+        else
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("EquipTime") then
+                    Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
+                end
+            end
+        end
+    end
+})
+
+
+MiscPlayer:AddToggle({
+    text = "CB:RO Infinite Firerate",
+    state = false,
+    risky = false,
+    tooltip = "Removes the firerate limit for all weapons.",
+    flag = "InfiniteFirerate",
+    callback = function(v)
+        if v then
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("FireRate") then
+                    Weapon:FindFirstChild("FireRate").Value = 0
+                end
+            end
+        else
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("FireRate") then
+                    Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
+                end
+            end
+        end
+    end
+})
+
+MiscPlayer:AddToggle({
+    text = "CB:RO Infinite Ammo",
+    state = false,
+    risky = false,
+    tooltip = "Grants infinite ammo for all weapons.",
+    flag = "InfiniteAmmo",
+    callback = function(v)
+        if v then
+            for _, Weapon in ipairs(Weapons:GetChildren()) do
+                if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
+                    Weapon:FindFirstChild("Ammo").Value = 9999999999
+                    Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
+                end
+            end
+        else
+            -- Optionally reset ammo values here if needed
+        end
+    end
+})
+
+
+
 
 LPlayer:AddToggle({
     enabled = true,
