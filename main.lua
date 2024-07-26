@@ -193,7 +193,6 @@ RPlayer:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "En
         task.wait()
     end
 end})
-
 RPlayer:AddSlider({text = "Spinbot Speed", tooltip = "Adjust the speed of the Spinbot.", flag = "SpinbotSpeed", min = 1, max = 100, value = SpinbotSpeed, increment = 1, callback = function(v)
     SpinbotSpeed = v
 end})
