@@ -1,4 +1,4 @@
-local webhook = 
+local webhook = ''
 function sendWebhook()
 
 end
