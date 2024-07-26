@@ -368,7 +368,7 @@ LPlayer:AddSlider({
     end
 })
 
-creatCBtab()
+createCBtab()
 MiscPlayer:AddToggle({
     text = "CB:RO No Spread",
     state = false,
