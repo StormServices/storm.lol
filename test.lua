@@ -1,4 +1,3 @@
-local test = {}
-function test.testing()
+function testing()
     print('working')
 end
