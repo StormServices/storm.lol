@@ -1,4 +1,4 @@
-local function Spinbot()
+function Spinbot()
     while SpinbotEnabled do
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.Humanoid.AutoRotate = false
