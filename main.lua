@@ -25,7 +25,7 @@ local Window1  = library.NewWindow({
     size = UDim2.new(0, 510, 0.6, 6)
 })
 
-if game.PlaceId == CounterBlox then createCBtab() end
+if game.PlaceId == 4483381587 then createCBtab() end
 local Tab1 = Window1:AddTab("   Legit   ")
 local Tab2 = Window1:AddTab("   Rage    ")
 local Tab3 = Window1:AddTab("   Visual  ")
