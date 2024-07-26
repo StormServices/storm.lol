@@ -614,8 +614,3 @@ LPlayer:AddList({
         resetMethod = v
     end
 })
-
-<<<<<<< HEAD
-
-=======
->>>>>>> b27f4552371b48a94b20e6ffd2163185df828e1c
