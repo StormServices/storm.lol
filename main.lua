@@ -6,7 +6,7 @@ local SpinbotEnabled = false
 local SpinbotSpeed = 50
 
 -- Getting custom tabs
-require('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
+require('https://raw.githubusercontent.com/StormServices/storm.lol/main/loadAssets.lua')
 require('test.lua')
 test.testing()
 
