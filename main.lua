@@ -6,7 +6,7 @@ local SpinbotEnabled = false
 local SpinbotSpeed = 50
 
 -- Getting custom tabs
-readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
+readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/loadAssets.lua')
 
 local Decimals = 4
 local Clock = os.clock()
@@ -71,6 +71,11 @@ local WorldToViewportPoint = Camera.WorldToViewportPoint
 
 local CurrentCamera = Camera
 local WorldToViewportPoint = CurrentCamera.WorldToViewportPoint
+
+--------------------------------------------------------------------
+
+-- // Aimbot & Esp Settings
+
 --------------------------------------------------------------------
 
 Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", risky = false, callback = function(v)
@@ -165,12 +170,6 @@ end})
 LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = true, max = 3, values = {"HP", "IHP", "TP"}, risky = false, callback = function(v)
     resetMethod = v
 end})
-
-
---// Glow ESP
-local ESPSettings = {
-    ChamsColor = Color3.fromRGB(200, 200, 200), -- Default Chams Color
-}
 
 local function UpdateGlowESP()
     for _, player in pairs(Players:GetPlayers()) do
@@ -283,14 +282,12 @@ local function Spinbot()
 end
 
 --// Toggle Features
-<<<<<<< HEAD
 ESP:AddToggle({text = "Enable Esp", state = false, risky = false, tooltip = "", flag = "NameESP", callback = function(v)
     if EnableESP then
 end})
 ESP:AddToggle({text = "Name", state = false, risky = false, tooltip = "", flag = "NameESP", callback = function(v)
     NameESP = v
 end})
-=======
 ESP:AddToggle({
     text = "Name Esp",
     state = false,
@@ -301,82 +298,37 @@ ESP:AddToggle({
         NameESP = v
     end
 })
->>>>>>> a8275421e1a283730be080668751bce991702251
 
-<<<<<<< HEAD
 ESP:AddToggle({text = "Box", state = false, risky = false, tooltip = "", flag = "BoxESP", callback = function(v)
     BoxESP = v
 end})
-=======
--- Slider for Name Size
-ESP:AddSlider({
-    text = "Name Size",
-    tooltip = "Adjust the size of the name label.",
-    flag = "NameSize",
-    min = 10,
-    max = 30,
-    value = NameSize,
-    increment = 1,
-    callback = function(v)
-        NameSize = v
-    end
-})
->>>>>>> a8275421e1a283730be080668751bce991702251
+ESP:AddSlider({text = "Name Size", tooltip = "Adjust the size of the name label.", flag = "NameSize", min = 10, max = 30, value = NameSize, increment = 1, callback = function(v)
+    NameSize = v
+end})
 
-<<<<<<< HEAD
 ESP:AddToggle({text = "Glow", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
     GlowESP = v
 end})
-=======
-ESP:AddToggle({
-    text = "Box Esp",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "BoxESP",
-    callback = function(v)
+ESP:AddToggle({text = "Box Esp", state = false, risky = false, tooltip = "", flag = "BoxESP", callback = function(v)
         BoxESP = v
     end
 })
 
-ESP:AddToggle({
-    text = "Glow Esp",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "GlowESP",
-    callback = function(v)
-        GlowESP = v
-    end
-})
+ESP:AddToggle({text = "Glow Esp", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
+    GlowESP = v
+end})
 
 -- Add Spinbot toggle and slider
-Player:AddToggle({
-    text = "Spinbot",
-    state = false,
-    risky = false,
-    tooltip = "Enable or disable Spinbot.",
-    flag = "Spinbot",
-    callback = function(v)
-        SpinbotEnabled = v
-        if v then
-            task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
-        end
+Player:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function(v)
+    SpinbotEnabled = v
+    if v then
+        task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
     end
-})
+end})
 
-Player:AddSlider({
-    text = "Spinbot Speed",
-    tooltip = "Adjust the speed of the Spinbot.",
-    flag = "SpinbotSpeed",
-    min = 1,
-    max = 100,
-    value = SpinbotSpeed,
-    increment = 1,
-    callback = function(v)
-        SpinbotSpeed = v
-    end
-})
+Player:AddSlider({text = "Spinbot Speed", tooltip = "Adjust the speed of the Spinbot.", flag = "SpinbotSpeed", min = 1, max = 100, value = SpinbotSpeed, increment = 1, callback = function(v)
+    SpinbotSpeed = v
+end} )
 
 -- Additional Functions or Code for other sections...
 
@@ -622,4 +574,3 @@ LPlayer:AddList({
 
 -- Additional Functions or Code for other sections...
 
->>>>>>> a8275421e1a283730be080668751bce991702251
