@@ -2,11 +2,9 @@ function createCBtab()
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/StormServices/storm.lol/main/StormLibrary.lua"))
 
-local CounterBlox = Window1:AddTab("   Counter Blox   ")
-
-local Aim = CounterBlox:AddSection("Aim", 1)
-local Guns = CounterBlox:AddSection("Guns Modif", 2)
-local CbVisuals = CounterBlox:AddSection("Visuals", 3)
+local Aim = Tab5:AddSection("Aim", 1)
+local Guns = Tab5:AddSection("Guns Modif", 2)
+local CbVisuals = Tab5:AddSection("Visuals", 3)
 
 Guns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
     if v then

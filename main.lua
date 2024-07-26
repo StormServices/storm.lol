@@ -35,11 +35,6 @@ local SettingsTab = library:CreateSettingsTab(Window1)
 
 --------------------------------------------------------------------
 
-if game.PlaceId == 4483381587 then
-    local Aim = CounterBlox:AddSection("Aim", 1)
-    local Misc = CounterBlox:AddSection("Misc Modif", 2)
-    local CbVisuals = CounterBlox:AddSection("Visuals", 3)
-end
 local Main = Tab1:AddSection("Lock", 1)
 local TriggerBot = Tab1:AddSection("Trigger Bot", 2)
 local LPlayer = Tab1:AddSection("Player", 3) -- make respawn for games who dont allow resetting, or whatever u playing ( dont lose Misc )
@@ -233,109 +228,59 @@ ESP:AddToggle({
     end
 })
 
+
+
 -- Add Spinbot toggle and slider
-Player:AddToggle({
-    text = "Spinbot",
-    state = false,
-    risky = false,
-    tooltip = "Enable or disable Spinbot.",
-    flag = "Spinbot",
-    callback = function(v)
-        SpinbotEnabled = v
-        if v then
-            task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
-        end
+Player:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function(v)
+    SpinbotEnabled = v
+    if v then
+        task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
     end
-})
+end})
 
-Player:AddSlider({
-    text = "Spinbot Speed",
-    tooltip = "Adjust the speed of the Spinbot.",
-    flag = "SpinbotSpeed",
-    min = 1,
-    max = 100,
-    value = SpinbotSpeed,
-    increment = 1,
-    callback = function(v)
-        SpinbotSpeed = v
-    end
-})
+Player:AddSlider({text = "Spinbot Speed", tooltip = "Adjust the speed of the Spinbot.", flag = "SpinbotSpeed", min = 1, max = 100, value = SpinbotSpeed, increment = 1, callback = function(v)
+    SpinbotSpeed = v
+end})
 
--- Additional Functions or Code for other sections...
-
-Main:AddToggle({
-    text = "Aimbot",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "Toggle_1",
-    callback = function(v)
-        if v then
-            -- Aimbot code
-            while true do
-                local closestPlayer = nil
-                local closestDistance = math.huge
-                for _, player in pairs(game.Players:GetPlayers()) do
-                    if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
-                        local character = player.Character
-                        local targetPosition = character[targetPart].Position
-                        local distance = (targetPosition - Camera.CFrame.Position).Magnitude
-                        if distance < closestDistance and distance < fovRadius then
-                            closestDistance = distance
-                            closestPlayer = player
-                        end
+Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
+    if v then
+        -- Aimbot code
+        while true do
+            local closestPlayer = nil
+            local closestDistance = math.huge
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
+                    local character = player.Character
+                    local targetPosition = character[targetPart].Position
+                    local distance = (targetPosition - Camera.CFrame.Position).Magnitude
+                    if distance < closestDistance and distance < fovRadius then
+                        closestDistance = distance
+                        closestPlayer = player
                     end
                 end
-                if closestPlayer then
-                    local targetPosition = closestPlayer.Character[targetPart].Position
-                    local cameraPosition = Camera.CFrame.Position
-                    local direction = (targetPosition - cameraPosition).Unit
-                    Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(cameraPosition + direction * smoothness), 0.1)
-                end
-                wait()
             end
+            if closestPlayer then
+                local targetPosition = closestPlayer.Character[targetPart].Position
+                local cameraPosition = Camera.CFrame.Position
+                local direction = (targetPosition - cameraPosition).Unit
+                Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(cameraPosition + direction * smoothness), 0.1)
+            end
+            wait()
         end
     end
-})
+end})
 
-Main:AddToggle({
-    text = "Toggle",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "Toggle_1",
-    callback = function(v)
-        print(notMade)
-    end
-})
+Main:AddToggle({text = "Toggle", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
+    print(notMade)
+end})
 
-Main:AddList({
-    enabled = true,
-    text = "Aim Part",
-    tooltip = "",
-    selected = "Head",
-    multi = false,
-    open = false,
-    max = 4,
-    values = {"Head", "Neck", "Torso"},
-    callback = function(v)
-        targetPart = v
-    end
-})
+Main:AddList({enabled = true, text = "Aim Part", tooltip = "", selected = "Head", multi = false, open = false, max = 4, values = {"Head", "Neck", "Torso"}, callback = function(v)
+    targetPart = v
+end})
 
-Main:AddBind({
-    enabled = true,
-    text = "Lock Keybind",
-    mode = "toggle",
-    bind = "Mouse",
-    flag = "ToggleKey_1",
-    state = false,
-    nomouse = false,
-    noindicator = false,
-    callback = function(v)
-        bind = v
-    end
-})
+Main:AddBind({enabled = true, text = "Lock Keybind", mode = "toggle", bind = "Mouse", flag = "ToggleKey_1", state = false, nomouse = false, noindicator = false, callback = function(v)
+    bind = v
+end})
 
 Main:AddSeparator({
     enabled = true,
@@ -423,6 +368,7 @@ LPlayer:AddSlider({
     end
 })
 
+creatCBtab()
 MiscPlayer:AddToggle({
     text = "CB:RO No Spread",
     state = false,
@@ -470,155 +416,107 @@ MiscPlayer:AddToggle({
 })
 
 
-MiscPlayer:AddToggle({
-    text = "CB:RO Instant Equip",
-    state = false,
-    risky = false,
-    tooltip = "Instantly equips all weapons.",
-    flag = "InstantEquip",
-    callback = function(v)
-        if v then
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("EquipTime") then
-                    Weapon:FindFirstChild("EquipTime").Value = 0.05
-                end
+MiscPlayer:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("EquipTime") then
+                Weapon:FindFirstChild("EquipTime").Value = 0.05
             end
-        else
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("EquipTime") then
-                    Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
-                end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("EquipTime") then
+                Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
             end
         end
     end
-})
+end})
 
 
-MiscPlayer:AddToggle({
-    text = "CB:RO Infinite Firerate",
-    state = false,
-    risky = false,
-    tooltip = "Removes the firerate limit for all weapons.",
-    flag = "InfiniteFirerate",
-    callback = function(v)
-        if v then
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("FireRate") then
-                    Weapon:FindFirstChild("FireRate").Value = 0
-                end
+MiscPlayer:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("FireRate") then
+                Weapon:FindFirstChild("FireRate").Value = 0
             end
-        else
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("FireRate") then
-                    Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
-                end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("FireRate") then
+                Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
             end
         end
     end
-})
+end})
 
-MiscPlayer:AddToggle({
-    text = "CB:RO Infinite Ammo",
-    state = false,
-    risky = false,
-    tooltip = "Grants infinite ammo for all weapons.",
-    flag = "InfiniteAmmo",
-    callback = function(v)
-        if v then
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
-                    Weapon:FindFirstChild("Ammo").Value = 9999999999
-                    Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
-                end
+MiscPlayer:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
+                Weapon:FindFirstChild("Ammo").Value = 9999999999
+                Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
             end
-        else
-            -- Optionally reset ammo values here if needed
         end
+    else
+        -- Optionally reset ammo values here if needed
     end
-})
+end})
 
 
 
 
-LPlayer:AddToggle({
-    enabled = true,
-    text = "Enable Speed",
-    state = false,
-    callback = function(v)
-        if v then
+LPlayer:AddToggle({enabled = true, text = "Enable Speed", state = false, callback = function(v)
+    if v then
+        local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            oldSpeed = humanoid.WalkSpeed
+            humanoid.WalkSpeed = LegitspeedValue
+        end
+    else
+        if oldSpeed then
             local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             if humanoid then
-                oldSpeed = humanoid.WalkSpeed
-                humanoid.WalkSpeed = LegitspeedValue
-            end
-        else
-            if oldSpeed then
-                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.WalkSpeed = oldSpeed
-                end
+                humanoid.WalkSpeed = oldSpeed
             end
         end
     end
-})
+end})
 
-LPlayer:AddToggle({
-    enabled = true,
-    text = "Enable Jump",
-    state = false,
-    callback = function(v)
-        if v then
+LPlayer:AddToggle({enabled = true, text = "Enable Jump", state = false, callback = function(v)
+    if v then
+        local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            oldJump = humanoid.JumpPower
+            humanoid.JumpPower = LegitjumpValue
+        end
+    else
+        if oldJump then
             local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             if humanoid then
-                oldJump = humanoid.JumpPower
-                humanoid.JumpPower = LegitjumpValue
-            end
-        else
-            if oldJump then
-                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.JumpPower = oldJump
-                end
+                humanoid.JumpPower = oldJump
             end
         end
     end
-})
+end})
 
-LPlayer:AddButton({
-    enabled = true,
-    text = "Reset",
-    tooltip = "Reset if game doesn't have reset enabled",
-    confirm = true,
-    risky = true,
-    callback = function()
-        if resetMethod == 'HP' then
-            local plrHealth = LocalPlayer.Character.Humanoid.Health
-            local decreaseRate = plrHealth / (HPtiming / 0.1)
-            while plrHealth > 0 do
-                plrHealth = plrHealth - decreaseRate
-                wait(0.1)
-            end
-        elseif resetMethod == 'IHP' then
-            LocalPlayer.Character.Humanoid.Health = 0
-        elseif resetMethod == 'TP' then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -999999999, 0)
+LPlayer:AddButton({enabled = true, text = "Reset", tooltip = "Reset if game doesn't have reset enabled", confirm = true, risky = true, callback = function()
+    if resetMethod == 'HP' then
+        local plrHealth = LocalPlayer.Character.Humanoid.Health
+        local decreaseRate = plrHealth / (HPtiming / 0.1)
+        while plrHealth > 0 do
+            plrHealth = plrHealth - decreaseRate
+            wait(0.1)
         end
+    elseif resetMethod == 'IHP' then
+        LocalPlayer.Character.Humanoid.Health = 0
+    elseif resetMethod == 'TP' then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -999999999, 0)
     end
-})
+end})
 
-LPlayer:AddList({
-    enabled = true,
-    text = "Reset method",
-    tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void",
-    selected = "HP",
-    multi = false,
-    open = true,
-    max = 3,
-    values = {"HP", "IHP", "TP"},
-    callback = function(v)
-        resetMethod = v
-    end
-})
+LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = true, max = 3, values = {"HP", "IHP", "TP"}, callback = function(v)
+    resetMethod = v
+end})
 
 Misc:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
     if v then
@@ -669,7 +567,6 @@ Misc:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tool
     end
 end})
 
-
 Misc:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
@@ -685,7 +582,6 @@ Misc:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, 
         end
     end
 end})
-
 Misc:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
@@ -699,7 +595,7 @@ Misc:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tool
     end
 end})
 
-CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip = "", flag = "InfiniteAmmo", callback = function(v)
     if v then
         for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
             if Stuff:IsA("Model") and Stuff.Name == "Arms" then
