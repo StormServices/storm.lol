@@ -11,6 +11,7 @@ readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/loadCustoms.lua')
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/safeLocation.lua')
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/speed.lua')
+readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/assets/spinBot.lua')
 
 -- checks
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/checks/checker.lua')
@@ -27,7 +28,8 @@ readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/customT
 
 -- universal
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/universal/AntiAfk.lua')
-
+readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/universal/esp.lua')
+readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/universal/infJump.lua')
 
 -- webhook
 readfile('https://raw.githubusercontent.com/StormServices/storm.lol/main/webhook/webhook.lua')
