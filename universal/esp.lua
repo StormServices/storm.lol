@@ -1,4 +1,4 @@
-local function UpdateGlowESP()
+function UpdateGlowESP()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
             local Highlight = player.Character:FindFirstChild("Highlight")
@@ -25,7 +25,7 @@ end)
 
 
 --// Name ESP
-local function UpdateNameESP()
+function UpdateNameESP()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
             local nameLabel = player.Character:FindFirstChild("NameLabel")
@@ -60,7 +60,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 --// Box ESP
-local function UpdateBoxESP()
+function UpdateBoxESP()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
             local head = player.Character:FindFirstChild("Head")
