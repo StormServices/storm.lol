@@ -212,7 +212,7 @@ ESP:AddToggle({text = "Glow Esp", state = false, risky = false, tooltip = "", fl
     GlowESP = v
 end})
 
-CbGun:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
+CbGuns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("Spread") then
@@ -228,7 +228,7 @@ CbGun:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip
     end
 end})
 
-CbGun:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
+CbGuns:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("ReloadTime") then
@@ -245,7 +245,7 @@ CbGun:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = fa
 end})
 
 
-CbGun:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
+CbGuns:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("EquipTime") then
@@ -262,7 +262,7 @@ CbGun:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, too
 end})
 
 
-CbGun:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
+CbGuns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("FireRate") then
@@ -278,7 +278,7 @@ CbGun:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false,
     end
 end})
 
-CbGun:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+CbGuns:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
