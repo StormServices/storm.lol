@@ -24,7 +24,6 @@ local Window1  = library.NewWindow({
     title = "storm.lol | dev version", -- Mainwindow Text
     size = UDim2.new(0, 510, 0.6, 6)
 })
-
 local Tab1 = Window1:AddTab("   Legit   ")
 local Tab2 = Window1:AddTab("   Rage    ")
 local Tab3 = Window1:AddTab("   Visual  ")
@@ -34,7 +33,6 @@ local Tab5 = Window1:AddTab("   Misc    ")
 local SettingsTab = library:CreateSettingsTab(Window1)
 
 --------------------------------------------------------------------
-
 local Main = Tab1:AddSection("Lock", 1)
 local TriggerBot = Tab1:AddSection("Trigger Bot", 2)
 local LPlayer = Tab1:AddSection("Player", 3) -- make respawn for games who dont allow resetting, or whatever u playing ( dont lose Misc )
@@ -52,6 +50,10 @@ local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
 
 local Misc = Tab5:AddSection("Misc", 1) -- idk
 local MiscPlayer = Tab5:AddSection("Player", 2) -- make tp/view/bring
+if game.PlaceId == 4483381587 then
+    local Guns = Tab5:AddSection("Guns Modif", 3)
+    local CbVisuals = Tab5:AddSection("Visuals", 4)
+end
 --------------------------------------------------------------------
 
 -- Services
@@ -636,3 +638,124 @@ CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip 
         end
     end
 end})
+Guns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("Spread") then
+                Weapon:FindFirstChild("Spread").Value = 0
+            end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("Spread") then
+                Weapon:FindFirstChild("Spread").Value = OriginalSpreadValues[Weapon.Name] or 1
+            end
+        end
+    end
+end})
+
+Guns:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("ReloadTime") then
+                Weapon:FindFirstChild("ReloadTime").Value = 0.05
+            end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("ReloadTime") then
+                Weapon:FindFirstChild("ReloadTime").Value = OriginalReloadTimes[Weapon.Name] or 1
+            end
+        end
+    end
+end})
+
+
+Guns:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("EquipTime") then
+                Weapon:FindFirstChild("EquipTime").Value = 0.05
+            end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("EquipTime") then
+                Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
+            end
+        end
+    end
+end})
+
+
+Guns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("FireRate") then
+                Weapon:FindFirstChild("FireRate").Value = 0
+            end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("FireRate") then
+                Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
+            end
+        end
+    end
+end})
+
+Guns:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
+                Weapon:FindFirstChild("Ammo").Value = 9999999999
+                Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
+            end
+        end
+    else
+        -- Optionally reset ammo values here if needed
+    end
+end})
+
+CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v then
+        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
+            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
+                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
+                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
+                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
+                            if Arm:IsA("BasePart") then
+                                Arm.Transparency = 1
+                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
+                                    if StuffInArm:IsA("BasePart") then
+                                        StuffInArm.Material = Enum.Material.ForceField
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
+            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
+                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
+                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
+                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
+                            if Arm:IsA("BasePart") then
+                                Arm.Transparency = 0
+                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
+                                    if StuffInArm:IsA("BasePart") then
+                                        StuffInArm.Material = Enum.Material.Plastic
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end})
+end
