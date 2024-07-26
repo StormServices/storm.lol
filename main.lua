@@ -40,7 +40,7 @@ local LFov = Tab1:AddSection("FOV", 4)
 local AimCfg = Tab1:AddSection("Config", 5)
 
 local sAim = Tab2:AddSection("Rage", 1)
-local Player = Tab2:AddSection("Player", 2) -- make fly
+local RPlayer = Tab2:AddSection("Player", 2) -- make fly
 
 local ESP = Tab3:AddSection("Enemies", 1)
 local LocalEsp = Tab3:AddSection("Local", 2)
@@ -50,10 +50,8 @@ local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
 
 local Misc = Tab5:AddSection("Misc", 1) -- idk
 local MiscPlayer = Tab5:AddSection("Player", 2) -- make tp/view/bring
-if game.PlaceId == 4483381587 then
-    local Guns = Tab5:AddSection("Guns Modif", 3)
-    local CbVisuals = Tab5:AddSection("Visuals", 4)
-end
+local CbGuns = Tab5:AddSection("CB:RO Guns Modif", 3)
+local CbVisuals = Tab5:AddSection("CB:RO Visuals", 4)
 --------------------------------------------------------------------
 
 -- Services
@@ -71,103 +69,7 @@ local ESPSettings = {
     ChamsColor = Color3.fromRGB(200, 200, 200), -- Default Chams Color
 }
 
-local function UpdateGlowESP()
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local Highlight = player.Character:FindFirstChild("Highlight")
-            if GlowESP then
-                if not Highlight then
-                    Highlight = Instance.new("Highlight")
-                    Highlight.Name = "Highlight"
-                    Highlight.Parent = player.Character
-                end
-                Highlight.FillColor = player.TeamColor and player.TeamColor.Color or ESPSettings.ChamsColor
-            else
-                if Highlight then
-                    Highlight:Destroy()
-                end
-            end
-        end
-    end
-end
 
--- Update Glow ESP continuously
-RunService.RenderStepped:Connect(function()
-    UpdateGlowESP()
-end)
-
-
---// Name ESP
-local function UpdateNameESP()
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local nameLabel = player.Character:FindFirstChild("NameLabel")
-            if NameESP then
-                if not nameLabel then
-                    nameLabel = Instance.new("TextLabel")
-                    nameLabel.Name = "NameLabel"
-                    nameLabel.Parent = player.Character
-                    nameLabel.BackgroundTransparency = 1
-                    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    nameLabel.TextStrokeTransparency = 0.8
-                    nameLabel.TextScaled = true
-                end
-                nameLabel.Text = player.Name
-                local textSize = NameSize
-                nameLabel.Size = UDim2.new(0, textSize * #player.Name, 0, textSize)
-                nameLabel.Position = UDim2.new(0.5, -textSize * #player.Name / 2, 0, -textSize)
-                nameLabel.TextSize = textSize
-                nameLabel.Visible = true
-            else
-                if nameLabel then
-                    nameLabel.Visible = false
-                end
-            end
-        end
-    end
-end
-
--- Update Name ESP continuously
-RunService.RenderStepped:Connect(function()
-    UpdateNameESP()
-end)
-
---// Box ESP
-local function UpdateBoxESP()
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local head = player.Character:FindFirstChild("Head")
-            local box = player.Character:FindFirstChild("BoxESP")
-            if BoxESP then
-                if not box then
-                    box = Instance.new("Frame")
-                    box.Name = "BoxESP"
-                    box.Parent = player.Character
-                    box.Size = UDim2.new(0, 100, 0, 100)
-                    box.BorderColor3 = Color3.fromRGB(255, 0, 0)
-                    box.BorderSizePixel = 2
-                    box.BackgroundTransparency = 1
-                end
-                -- Update box size and position
-                local _, onScreen = Camera:WorldToViewportPoint(head.Position)
-                if onScreen then
-                    local boxSize = Vector2.new(100, 100)
-                    box.Size = UDim2.new(0, boxSize.X, 0, boxSize.Y)
-                    box.Position = UDim2.new(0, head.Position.X - boxSize.X / 2, 0, head.Position.Y - boxSize.Y / 2)
-                end
-            else
-                if box then
-                    box:Destroy()
-                end
-            end
-        end
-    end
-end
-
--- Update Box ESP continuously
-RunService.RenderStepped:Connect(function()
-    UpdateBoxESP()
-end)
 
 --// Spinbot Function
 local function Spinbot()
@@ -182,71 +84,8 @@ local function Spinbot()
     end
 end
 
---// Toggle Features
-ESP:AddToggle({
-    text = "Name Esp",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "NameESP",
-    callback = function(v)
-        NameESP = v
-    end
-})
-
--- Slider for Name Size
-ESP:AddSlider({
-    text = "Name Size",
-    tooltip = "Adjust the size of the name label.",
-    flag = "NameSize",
-    min = 10,
-    max = 30,
-    value = NameSize,
-    increment = 1,
-    callback = function(v)
-        NameSize = v
-    end
-})
-
-ESP:AddToggle({
-    text = "Box Esp",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "BoxESP",
-    callback = function(v)
-        BoxESP = v
-    end
-})
-
-ESP:AddToggle({
-    text = "Glow Esp",
-    state = false,
-    risky = false,
-    tooltip = "",
-    flag = "GlowESP",
-    callback = function(v)
-        GlowESP = v
-    end
-})
-
-
-
--- Add Spinbot toggle and slider
-Player:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function(v)
-    SpinbotEnabled = v
-    if v then
-        task.spawn(Spinbot) -- Start the Spinbot function in a separate thread
-    end
-end})
-
-Player:AddSlider({text = "Spinbot Speed", tooltip = "Adjust the speed of the Spinbot.", flag = "SpinbotSpeed", min = 1, max = 100, value = SpinbotSpeed, increment = 1, callback = function(v)
-    SpinbotSpeed = v
-end})
-
 Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
     if v then
-        -- Aimbot code
         while true do
             local closestPlayer = nil
             local closestDistance = math.huge
@@ -283,190 +122,27 @@ end})
 Main:AddBind({enabled = true, text = "Lock Keybind", mode = "toggle", bind = "Mouse", flag = "ToggleKey_1", state = false, nomouse = false, noindicator = false, callback = function(v)
     bind = v
 end})
-
-Main:AddSeparator({
-    enabled = true,
-    text = "Checkers"
-})
-
-Main:AddToggle({
-    text = "Visible Check",
-    state = true,
-    risky = false,
-    tooltip = "If enabled, assist will only work if not behind a wall/surface.",
-    flag = "wallCheck",
-    callback = function(v)
-        print(notMade)
-    end
-})
-
-Main:AddToggle({
-    text = "Status Check",
-    state = true,
-    risky = false,
-    tooltip = "Prevent from locking on dead players",
-    flag = "aliveCheck",
-    callback = function(v)
-        print(notMade)
-    end
-})
-
-Main:AddToggle({
-    text = "Whitelist",
-    state = false,
-    risky = false,
-    tooltip = "Whitelist people away from the aimbot.",
-    flag = "friendCheck",
-    callback = function(v)
-        print(notMade)
-    end
-})
-
-Main:AddList({
-    enabled = true,
-    text = "Whitelist",
-    tooltip = "Whitelist Here",
-    selected = "",
-    multi = false,
-    open = false,
-    max = 1,
-    values = {"Friend list", "Whitelisted"},
-    callback = function(v)
-        print(notMade)
-    end
-})
-
-LPlayer:AddSlider({
-    enabled = true,
-    text = "Speed",
-    tooltip = "",
-    flag = "LegitplrSpeed",
-    suffix = "",
-    dragging = true,
-    focused = false,
-    min = 0,
-    max = 60,
-    value = 16,
-    increment = 0.1,
-    callback = function(v)
-        LegitspeedValue = v
-    end
-})
-
-LPlayer:AddSlider({
-    enabled = true,
-    text = "Jump",
-    tooltip = "",
-    flag = "LegitplrJump",
-    suffix = "",
-    dragging = true,
-    focused = false,
-    min = 0,
-    max = 500,
-    value = 50,
-    increment = 0.1,
-    callback = function(v)
-        LegitjumpValue = v
-    end
-})
-
-createCBtab()
-MiscPlayer:AddToggle({
-    text = "CB:RO No Spread",
-    state = false,
-    risky = false,
-    tooltip = "Disable spread for all weapons.",
-    flag = "NoSpread",
-    callback = function(v)
-        if v then
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("Spread") then
-                    Weapon:FindFirstChild("Spread").Value = 0
-                end
-            end
-        else
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("Spread") then
-                    Weapon:FindFirstChild("Spread").Value = OriginalSpreadValues[Weapon.Name] or 1
-                end
-            end
-        end
-    end
-})
-
-MiscPlayer:AddToggle({
-    text = "CB:RO Instant Weapon Reload",
-    state = false,
-    risky = false,
-    tooltip = "Instantly reloads all weapons.",
-    flag = "InstantReload",
-    callback = function(v)
-        if v then
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("ReloadTime") then
-                    Weapon:FindFirstChild("ReloadTime").Value = 0.05
-                end
-            end
-        else
-            for _, Weapon in ipairs(Weapons:GetChildren()) do
-                if Weapon:FindFirstChild("ReloadTime") then
-                    Weapon:FindFirstChild("ReloadTime").Value = OriginalReloadTimes[Weapon.Name] or 1
-                end
-            end
-        end
-    end
-})
-
-
-MiscPlayer:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("EquipTime") then
-                Weapon:FindFirstChild("EquipTime").Value = 0.05
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("EquipTime") then
-                Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
-            end
-        end
-    end
+Main:AddSeparator({enabled = true, text = "Checkers"}) -- // Separator
+Main:AddToggle({text = "Visible Check", state = true, risky = false, tooltip = "If enabled, assist will only work if not behind a wall/surface.", flag = "wallCheck", callback = function(v)
+    print(notMade)
 end})
 
-
-MiscPlayer:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("FireRate") then
-                Weapon:FindFirstChild("FireRate").Value = 0
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("FireRate") then
-                Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
-            end
-        end
-    end
+Main:AddToggle({text = "Status Check", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", callback = function(v)
+    print(notMade)
+end})
+Main:AddToggle({text = "Whitelist", state = false, risky = false, tooltip = "Whitelist people away from the aimbot.", flag = "friendCheck", callback = function(v)
+    print(notMade)
+end})
+Main:AddList({enabled = true, text = "Whitelist", tooltip = "Whitelist Here", selected = "", multi = false, open = false, max = 1, values = {"Friend list", "Whitelisted"}, callback = function(v)
+    print(notMade)
 end})
 
-MiscPlayer:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
-                Weapon:FindFirstChild("Ammo").Value = 9999999999
-                Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
-            end
-        end
-    else
-        -- Optionally reset ammo values here if needed
-    end
+LPlayer:AddSlider({enabled = true, text = "Speed", tooltip = "", flag = "LegitplrSpeed", suffix = "", dragging = true, focused = false, min = 0, max = 60, value = 16, increment = 0.1, callback = function(v)
+    LegitspeedValue = v
 end})
-
-
-
-
+LPlayer:AddSlider({enabled = true, text = "Jump", tooltip = "", flag = "LegitplrJump", suffix = "", dragging = true, focused = false, min = 0, max = 500, value = 50, increment = 0.1, callback = function(v)
+    LegitjumpValue = v
+end})
 LPlayer:AddToggle({enabled = true, text = "Enable Speed", state = false, callback = function(v)
     if v then
         local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -520,7 +196,33 @@ LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will dec
     resetMethod = v
 end})
 
-Misc:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
+RPlayer:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function(v)
+    SpinbotEnabled = v
+    if v then
+        task.spawn(Spinbot)
+    end
+end})
+
+RPlayer:AddSlider({text = "Spinbot Speed", tooltip = "Adjust the speed of the Spinbot.", flag = "SpinbotSpeed", min = 1, max = 100, value = SpinbotSpeed, increment = 1, callback = function(v)
+    SpinbotSpeed = v
+end})
+
+ESP:AddToggle({text = "Name Esp", state = false, risky = false, tooltip = "", flag = "NameESP", callback = function(v)
+    NameESP = v
+end})
+ESP:AddSlider({text = "Name Size", tooltip = "Adjust the size of the name label.", flag = "NameSize", min = 10, max = 30, value = NameSize, increment = 1, callback = function(v)
+    NameSize = v
+end})
+
+ESP:AddToggle({text = "Box Esp", state = false, risky = false, tooltip = "", flag = "BoxESP", callback = function(v)
+    BoxESP = v
+end})
+
+ESP:AddToggle({text = "Glow Esp", state = false, risky = false, tooltip = "", flag = "GlowESP", callback = function(v)
+    GlowESP = v
+end})
+
+CbGun:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("Spread") then
@@ -536,7 +238,7 @@ Misc:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip 
     end
 end})
 
-Misc:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
+CbGun:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("ReloadTime") then
@@ -553,125 +255,7 @@ Misc:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = fal
 end})
 
 
-Misc:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("EquipTime") then
-                Weapon:FindFirstChild("EquipTime").Value = 0.05
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("EquipTime") then
-                Weapon:FindFirstChild("EquipTime").Value = OriginalEquipTimes[Weapon.Name] or 1
-            end
-        end
-    end
-end})
-
-Misc:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("FireRate") then
-                Weapon:FindFirstChild("FireRate").Value = 0
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("FireRate") then
-                Weapon:FindFirstChild("FireRate").Value = OriginalFireRates[Weapon.Name] or 1
-            end
-        end
-    end
-end})
-Misc:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
-                Weapon:FindFirstChild("Ammo").Value = 9999999999
-                Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
-            end
-        end
-    else
-        -- Optionally reset ammo values here if needed
-    end
-end})
-
-CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip = "", flag = "InfiniteAmmo", callback = function(v)
-    if v then
-        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
-            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
-                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
-                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
-                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
-                            if Arm:IsA("BasePart") then
-                                Arm.Transparency = 1
-                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
-                                    if StuffInArm:IsA("BasePart") then
-                                        StuffInArm.Material = Enum.Material.ForceField
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    else
-        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
-            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
-                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
-                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
-                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
-                            if Arm:IsA("BasePart") then
-                                Arm.Transparency = 0
-                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
-                                    if StuffInArm:IsA("BasePart") then
-                                        StuffInArm.Material = Enum.Material.Plastic
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end})
-Guns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("Spread") then
-                Weapon:FindFirstChild("Spread").Value = 0
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("Spread") then
-                Weapon:FindFirstChild("Spread").Value = OriginalSpreadValues[Weapon.Name] or 1
-            end
-        end
-    end
-end})
-
-Guns:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
-    if v then
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("ReloadTime") then
-                Weapon:FindFirstChild("ReloadTime").Value = 0.05
-            end
-        end
-    else
-        for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("ReloadTime") then
-                Weapon:FindFirstChild("ReloadTime").Value = OriginalReloadTimes[Weapon.Name] or 1
-            end
-        end
-    end
-end})
-
-
-Guns:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
+CbGun:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("EquipTime") then
@@ -688,7 +272,7 @@ Guns:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tool
 end})
 
 
-Guns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
+CbGun:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("FireRate") then
@@ -704,7 +288,7 @@ Guns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, 
     end
 end})
 
-Guns:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+CbGun:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
     if v then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
@@ -758,4 +342,3 @@ CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip 
         end
     end
 end})
-end
