@@ -6,7 +6,9 @@ local SpinbotEnabled = false
 local SpinbotSpeed = 50
 
 -- Getting custom tabs
-readfile('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
+require('https://raw.githubusercontent.com/thraxhvh/storm.lol/main/loadAssets.lua')
+require('test.lua')
+test.testing()
 
 local Decimals = 4
 local Clock = os.clock()
@@ -25,7 +27,10 @@ local Window1  = library.NewWindow({
     size = UDim2.new(0, 510, 0.6, 6)
 })
 
-if game.PlaceId == counterBloxId then createCBtab() end
+local CounterBlox = {301549746}
+if game.PlaceId == CounterBlox[1] then
+    createCBtab()
+end
 local Tab1 = Window1:AddTab("   Legit   ")
 local Tab2 = Window1:AddTab("   Rage    ")
 local Tab3 = Window1:AddTab("   Visual  ")
@@ -614,3 +619,8 @@ LPlayer:AddList({
         resetMethod = v
     end
 })
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> b27f4552371b48a94b20e6ffd2163185df828e1c
