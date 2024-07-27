@@ -28,8 +28,8 @@ local Tab1 = Window1:AddTab("   Legit   ")
 local Tab2 = Window1:AddTab("   Rage    ")
 local Tab3 = Window1:AddTab("   Visual  ")
 local Tab4 = Window1:AddTab("   Anti-Aim    ")
-if funTabEnabled == true then createFunTab() end
-local Tab5 = Window1:AddTab("   Misc    ")
+local Tab5 = Window1:AddTab("   Fun    ")
+local Tab6 = Window1:AddTab("   Misc    ")
 local SettingsTab = library:CreateSettingsTab(Window1)
 
 --------------------------------------------------------------------
@@ -48,10 +48,10 @@ local LocalEsp = Tab3:AddSection("Local", 2)
 local Desync = Tab4:AddSection("Desync", 1)
 local FakeLag = Tab4:AddSection("Fake Lag", 2) -- make fake lag
 
-local Misc = Tab5:AddSection("Misc", 1) -- idk
-local MiscPlayer = Tab5:AddSection("Player", 2) -- make tp/view/bring
-local CbGuns = Tab5:AddSection("CB:RO Guns Modif", 1)
-local CbVisuals = Tab5:AddSection("CB:RO Visuals", 2)
+local Misc = Tab6:AddSection("Misc", 1) -- idk
+local MiscPlayer = Tab6:AddSection("Player", 2) -- make tp/view/bring
+local CbGuns = Tab6:AddSection("CB:RO Guns Modif", 1)
+local CbVisuals = Tab6:AddSection("CB:RO Visuals", 2)
 --------------------------------------------------------------------
 
 -- Services
@@ -167,31 +167,36 @@ RunService.RenderStepped:Connect(function()
     UpdateBoxESP()
 end)
 
-Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
-    if v then
-        while true do
-            local closestPlayer = nil
-            local closestDistance = math.huge
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
-                    local character = player.Character
-                    local targetPosition = character[targetPart].Position
-                    local distance = (targetPosition - Camera.CFrame.Position).Magnitude
-                    if distance < closestDistance and distance < fovRadius then
-                        closestDistance = distance
-                        closestPlayer = player
-                    end
-                end
+function GetClosestPlayer(CFrame)
+    local Ray = Ray.new(CFrame.Position, CFrame.LookVector).Unit
+
+    local Target = nil
+    local Mag = math.huge
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v.Character and v.Character:FindFirstChild("Humanoid").Health > 0 and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("HumanoidRootPart") and v ~= LocalPlayer and (v.Team ~= LocalPlayer.Team or (not AimSettings.TeamCheck)) then
+            local Position = v.Character.Head.Position
+            local MagBuff = (Position - Ray:ClosestPoint(Position)).Magnitude
+            if MagBuff < Mag then
+                Mag = MagBuff
+                Target = v
             end
-            if closestPlayer then
-                local targetPosition = closestPlayer.Character[targetPart].Position
-                local cameraPosition = Camera.CFrame.Position
-                local direction = (targetPosition - cameraPosition).Unit
-                Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(cameraPosition + direction * smoothness), 0.1)
-            end
-            wait()
         end
     end
+
+    return Target
+end
+
+-- Settings
+local AimSettings = {
+    Enabled = false,
+    TeamCheck = false,
+    Smoothing = 1,
+    EnableFOV = false
+}
+
+Main:AddToggle({text = "Aimbot", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
+    AimSettings.Enabled = v
 end})
 
 Main:AddToggle({text = "Toggle", state = false, risky = false, tooltip = "", flag = "Toggle_1", callback = function(v)
@@ -209,9 +214,11 @@ Main:AddSeparator({enabled = true, text = "Checkers"}) -- // Separator
 Main:AddToggle({text = "Visible Check", state = true, risky = false, tooltip = "If enabled, assist will only work if not behind a wall/surface.", flag = "wallCheck", callback = function(v)
     print(notMade)
 end})
-
-Main:AddToggle({text = "Status Check", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", callback = function(v)
+Main:AddToggle({text = "Alive Check", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", callback = function(v)
     print(notMade)
+end})
+Main:AddToggle({text = "Team Check", state = true, risky = false, tooltip = "Prevent from locking on dead players", flag = "aliveCheck", callback = function(v)
+    AimSettings.TeamCheck = v
 end})
 Main:AddToggle({text = "Whitelist", state = false, risky = false, tooltip = "Whitelist people away from the aimbot.", flag = "friendCheck", callback = function(v)
     print(notMade)
@@ -263,22 +270,45 @@ end})
 LPlayer:AddButton({enabled = true, text = "Reset", tooltip = "Reset if game doesn't have reset enabled", confirm = true, risky = true, callback = function()
     if resetMethod == 'HP' then
         local plrHealth = LocalPlayer.Character.Humanoid.Health
-        local decreaseRate = plrHealth / (HPtiming / 0.1)
         while plrHealth > 0 do
-            plrHealth = plrHealth - decreaseRate
-            wait(0.1)
+            plrHealth = plrHealth - 1
+            wait(0.3)
         end
     elseif resetMethod == 'IHP' then
         LocalPlayer.Character.Humanoid.Health = 0
     elseif resetMethod == 'TP' then
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -999999999, 0)
+    elseif resetMethod == 'Statement' then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Dead)
     end
 end})
 
-LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void", selected = "HP", multi = false, open = true, max = 3, values = {"HP", "IHP", "TP"}, callback = function(v)
+LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will decrease plr hp to 0 slowly\n IHP - Same as HP but instantly\n TP - Tp plr to void\n Statement - Will change the statement from Alive to Death", selected = "HP", multi = false, open = true, max = 3, values = {"HP", "IHP", "TP", "Statement"}, callback = function(v)
     resetMethod = v
 end})
 
+RPlayer:AddToggle({text = "Bhop", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function()
+    if v == true then
+        if LocalPlayer.Character ~= nil and UserInputService:IsKeyDown(Enum.KeyCode.Space) and LocalPlayer.PlayerGui.GUI.Main.GlobalChat.Visible == false then
+            LocalPlayer.Character.Humanoid.Jump = true
+            local Speed = BhopSpeed or 100
+            local Dir = Camera.CFrame.LookVector * Vector3.new(1,0,1)
+            local Move = Vector3.new()
+
+            Move = UserInputService:IsKeyDown(Enum.KeyCode.W) and Move + Dir or Move
+            Move = UserInputService:IsKeyDown(Enum.KeyCode.S) and Move - Dir or Move
+            Move = UserInputService:IsKeyDown(Enum.KeyCode.D) and Move + Vector3.new(-Dir.Z,0,Dir.X) or Move
+            Move = UserInputService:IsKeyDown(Enum.KeyCode.A) and Move + Vector3.new(Dir.Z,0,-Dir.X) or Move
+            if Move.Unit.X == Move.Unit.X then
+                Move = Move.Unit
+                LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(Move.X * Speed, LocalPlayer.Character.HumanoidRootPart.Velocity.Y, Move.Z * Speed)
+            end
+        end
+    end
+end})
+RPlayer:AddSlider({enabled = true, text = "Bhop Speed", tooltip = "", flag = "BhopSpeed", suffix = "", dragging = true, focused = false, min = 1, max = 500, value = 100, increment = 0.1, callback = function(v)
+    BhopSpeed = v
+end})
 RPlayer:AddToggle({text = "Spinbot", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function(v)
     SpinbotEnabled = v
     while SpinbotEnabled do
@@ -332,8 +362,58 @@ MiscPlayer:AddToggle({text = "TP Around the Map", state = false, risky = false, 
         end
     end
 end})
+MiscPlayer:AddToggle({text = "Fly", state = false, risky = false, tooltip = "", flag = "FlyEnabled", callback = function(v)
+    if v == true then
+        local function Fly()
+            if LocalPlayer.Character ~= nil then
+                local Speed = FlySpeed
+                local Velocity = Vector3.new(0, 1, 0)
+                local userInputService = game:GetService("UserInputService")
+
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                    Velocity = Velocity + (Camera.CoordinateFrame.lookVector * Speed)
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                    Velocity = Velocity + (Camera.CoordinateFrame.rightVector * -Speed)
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                    Velocity = Velocity + (Camera.CoordinateFrame.lookVector * -Speed)
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                    Velocity = Velocity + (Camera.CoordinateFrame.rightVector * Speed)
+                end
+
+                LocalPlayer.Character.HumanoidRootPart.Velocity = Velocity
+                LocalPlayer.Character.Humanoid.PlatformStand = true
+            end
+        end
+
+        game:GetService("RunService").RenderStepped:Connect(Fly)
+    else
+        game:GetService("RunService").RenderStepped:Disconnect(Fly)
+    end
+end})
+MiscPlayer:AddToggle({text = "Noclip", state = false, risky = false, tooltip = "", flag = "Noclip", callback = function(v)
+    if v == true then
+        for _, Instance in pairs(LocalPlayer.Character:GetChildren()) do
+            if Instance:IsA("BasePart") and Instance.CanCollide == true then
+                Instance.CanCollide = false
+            end
+        end
+    else
+        for _, Instance in pairs(LocalPlayer.Character:GetChildren()) do
+            if Instance:IsA("BasePart") and Instance.CanCollide == true then
+                Instance.CanCollide = true
+            end
+        end
+    end
+end})
+MiscPlayer:AddSlider({text = "Fly Speed", tooltip = "Adjust the speed of the Fly.", flag = "FlySpeed", min = 1, max = 100, value = 30, increment = 1, callback = function(v)
+    FlySpeed = v
+end})
+
 CbGuns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, tooltip = "Disable spread for all weapons.", flag = "NoSpread", callback = function(v)
-    if v then
+    if v == true then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("Spread") then
                 Weapon:FindFirstChild("Spread").Value = 0
@@ -349,7 +429,7 @@ CbGuns:AddToggle({text = "CB:RO No Spread", state = false, risky = false, toolti
 end})
 
 CbGuns:AddToggle({text = "CB:RO Instant Weapon Reload", state = false, risky = false, tooltip = "Instantly reloads all weapons.", flag = "InstantReload", callback = function(v)
-    if v then
+    if v == true then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("ReloadTime") then
                 Weapon:FindFirstChild("ReloadTime").Value = 0.05
@@ -366,7 +446,7 @@ end})
 
 
 CbGuns:AddToggle({text = "CB:RO Instant Equip", state = false, risky = false, tooltip = "Instantly equips all weapons.", flag = "InstantEquip", callback = function(v)
-    if v then
+    if v == true  then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("EquipTime") then
                 Weapon:FindFirstChild("EquipTime").Value = 0.05
@@ -383,7 +463,7 @@ end})
 
 
 CbGuns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false, tooltip = "Removes the firerate limit for all weapons.", flag = "InfiniteFirerate", callback = function(v)
-    if v then
+    if v == true  then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
             if Weapon:FindFirstChild("FireRate") then
                 Weapon:FindFirstChild("FireRate").Value = 0
@@ -399,20 +479,38 @@ CbGuns:AddToggle({text = "CB:RO Infinite Firerate", state = false, risky = false
 end})
 
 CbGuns:AddToggle({text = "CB:RO Infinite Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
-    if v then
+    if v == true then
         for _, Weapon in ipairs(Weapons:GetChildren()) do
-            if Weapon:FindFirstChild("Ammo") and Weapon:FindFirstChild("StoredAmmo") then
+            if Weapon:FindFirstChild("Ammo") then
                 Weapon:FindFirstChild("Ammo").Value = 9999999999
+            end
+        end
+    else
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("Ammo") then
+                Weapon:FindFirstChild("Ammo").Value = 30
+            end
+        end
+    end
+end})
+CbGuns:AddToggle({text = "CB:RO Infinite Stored Ammo", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v == true then
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("StoredAmmo") then
                 Weapon:FindFirstChild("StoredAmmo").Value = 9999999999
             end
         end
     else
-        -- Optionally reset ammo values here if needed
+        for _, Weapon in ipairs(Weapons:GetChildren()) do
+            if Weapon:FindFirstChild("StoredAmmo") then
+                Weapon:FindFirstChild("StoredAmmo").Value = 30
+            end
+        end
     end
 end})
 
-CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
-    if v then
+CbVisuals:AddToggle({text = "CB:RO Arms Chams", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v == true then
         for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
             if Stuff:IsA("Model") and Stuff.Name == "Arms" then
                 for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
@@ -451,4 +549,46 @@ CbVisuals:AddToggle({text = "Arms Chams", state = false, risky = false, tooltip 
             end
         end
     end
+end})
+CbVisuals:AddToggle({text = "CB:RO Guns Chams", state = false, risky = false, tooltip = "Grants infinite ammo for all weapons.", flag = "InfiniteAmmo", callback = function(v)
+    if v == true then
+        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
+            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
+                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
+                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
+                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
+                            if Arm:IsA("BasePart") then
+                                Arm.Transparency = 1
+                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
+                                    if StuffInArm:IsA("BasePart") then
+                                        StuffInArm.Material = Enum.Material.ForceField
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        for _, Stuff in ipairs(workspace.Camera:GetChildren()) do
+            if Stuff:IsA("Model") and Stuff.Name == "Arms" then
+                for _, AnotherStuff in ipairs(Stuff:GetChildren()) do
+                    if AnotherStuff:IsA("Model") and AnotherStuff.Name ~= "AnimSaves" then
+                        for _, Arm in ipairs(AnotherStuff:GetChildren()) do
+                            if Arm:IsA("BasePart") then
+                                Arm.Transparency = 0
+                                for _, StuffInArm in ipairs(Arm:GetChildren()) do
+                                    if StuffInArm:IsA("BasePart") then
+                                        StuffInArm.Material = Enum.Material.Plastic
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    task.wait()
 end})
