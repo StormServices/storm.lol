@@ -8,91 +8,36 @@ local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Window = Library:CreateWindow({
-    -- Set Center to true if you want the menu to appear in the center
-    -- Set AutoShow to true if you want the menu to appear when it is created
-    -- Position and Size are also valid options here
-    -- but you do not need to define them unless you are changing them :)
-
     Title = 'storm.lol',
     Center = true,
     AutoShow = true,
     TabPadding = 0
 })
 
--- CALLBACK NOTE:
--- Passing in callback functions via the initial element parameters (i.e. Callback = function(Value)...) works
--- HOWEVER, using Toggles/Options.INDEX:OnChanged(function(Value) ... ) is the RECOMMENDED way to do this.
--- I strongly recommend decoupling UI code from logic code. i.e. Create your UI elements FIRST, and THEN setup :OnChanged functions later.
-
--- You do not have to set your tabs & groups up this way, just a prefrence.
 local Tabs = {
-    -- Creates a new tab titled Main
-    Main = Window:AddTab('Main'),
+    Legit = Window:AddTab(" Legit "),
+    Rage = Window:AddTab(" Rage "),
+    Visual = Window:AddTab(" Visual "),
+    AntiAim = Window:AddTab(" Anti-Aim "),
+    Fun = Window:AddTab(" Fun "),
+    Misc = Window:AddTab(" Misc "),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
--- Groupbox and Tabbox inherit the same functions
--- except Tabboxes you have to call the functions on a tab (Tabbox:AddTab(name))
-local LeftGroupBox = Tabs.Main:AddLeftGroupbox('Groupbox')
+local LeftGroupBox = Tabs.Legit:AddLeftGroupbox('Groupbox')
 
--- We can also get our Main tab via the following code:
--- local LeftGroupBox = Window.Tabs.Main:AddLeftGroupbox('Groupbox')
+local Legit = TabBox:AddTab('Tab 1')
+local Legit = TabBox:AddTab('Tab 2')
 
--- Tabboxes are a tiny bit different, but here's a basic example:
---[[
-
-local TabBox = Tabs.Main:AddLeftTabbox() -- Add Tabbox on left side
-
-local Tab1 = TabBox:AddTab('Tab 1')
-local Tab2 = TabBox:AddTab('Tab 2')
-
--- You can now call AddToggle, etc on the tabs you added to the Tabbox
-]]
-
--- Groupbox:AddToggle
--- Arguments: Index, Options
 LeftGroupBox:AddToggle('MyToggle', {
     Text = 'This is a toggle',
     Default = true, -- Default value (true / false)
-    Tooltip = 'This is a tooltip', -- Information shown when you hover over the toggle
+    Tooltip = 'This is a tooltip',
 
     Callback = function(Value)
         print('[cb] MyToggle changed to:', Value)
     end
 })
-
-
--- Fetching a toggle object for later use:
--- Toggles.MyToggle.Value
-
--- Toggles is a table added to getgenv() by the library
--- You index Toggles with the specified index, in this case it is 'MyToggle'
--- To get the state of the toggle you do toggle.Value
-
--- Calls the passed function when the toggle is updated
-Toggles.MyToggle:OnChanged(function()
-    -- here we get our toggle object & then get its value
-    print('MyToggle changed to:', Toggles.MyToggle.Value)
-end)
-
--- This should print to the console: "My toggle state changed! New value: false"
-Toggles.MyToggle:SetValue(false)
-
--- 1/15/23
--- Deprecated old way of creating buttons in favor of using a table
--- Added DoubleClick button functionality
-
---[[
-    Groupbox:AddButton
-    Arguments: {
-        Text = string,
-        Func = function,
-        DoubleClick = boolean
-        Tooltip = string,
-    }
-
-    You can call :AddButton on a button to add a SubButton!
-]]
 
 local MyButton = LeftGroupBox:AddButton({
     Text = 'Button',
@@ -119,11 +64,6 @@ local MyButton2 = MyButton:AddButton({
     LeftGroupBox:AddButton({ Text = 'Kill all', Func = Functions.KillAll, Tooltip = 'This will kill everyone in the game!' })
         :AddButton({ Text = 'Kick all', Func = Functions.KickAll, Tooltip = 'This will kick everyone in the game!' })
 ]]
-
--- Groupbox:AddLabel
--- Arguments: Text, DoesWrap
-LeftGroupBox:AddLabel('This is a label')
-LeftGroupBox:AddLabel('This is a label\n\nwhich wraps its text!', true)
 
 -- Groupbox:AddDivider
 -- Arguments: None
