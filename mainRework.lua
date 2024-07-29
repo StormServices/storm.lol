@@ -27,9 +27,9 @@ local Tabs = {
 -- // Legit
 local Aimbot = Tabs.Legit:AddLeftGroupbox('Aimbot')
 local TriggerBot = Tabs.Legit:AddRightGroupbox("Trigger Bot")
-local LPlayer = Tabs.Legit:AddRightGroupBox("Player")
-local LFov = Tabs.Legit:AddLeftGroupBox("FOV")
-local AimCfg = Tabs.Legit:AddRightGroupBox("Config")
+local LPlayer = Tabs.Legit:AddRightGroupbox("Player")
+local LFov = Tabs.Legit:AddLeftGroupbox("FOV")
+local AimCfg = Tabs.Legit:AddRightGroupbox("Config")
 
 -- // Rage
 local sAim = Tabs.Rage:AddLeftGroupbox("Rage")
@@ -37,13 +37,13 @@ local RPlayer = Tabs.Rage:AddRightGroupbox("Player") -- make fly
 
 -- // Visuals
 local Esp = Tabs.Visual:AddLeftTabbox() --                 // Add ESP Left Tab Box
-local EnemiesEspTab = Esp:AddTab('Esp - Enemies') --       // Enemies ESP Left Tab Box
-local TeamEspTab = Esp:AddTab('Esp - Team') --             // Team ESP Left Tab Box
-local LocalEspTab = Esp:AddTab('Esp - Local') --           // Local ESP Left Tab Box
+local EnemiesEspTab = Esp:AddTab('Enemies') --       // Enemies ESP Left Tab Box
+local TeamEspTab = Esp:AddTab('Team') --             // Team ESP Left Tab Box
+local LocalEspTab = Esp:AddTab('Local') --           // Local ESP Left Tab Box
 local Chams = Tabs.Visual:AddRightTabbox() --              // Add Chams Right Tab Box
-local EnemiesChamsTab = Chams:AddTab('Chams - Enemies') -- // Enemies Chams Right Tab Box
-local TeamChamsTab = Chams:AddTab('Chams - Team') --       // Team Chams Right Tab Box
-local LocalChamsTab = Chams:AddTab('Chams - Local') --     // Local Chams Right Tab Box
+local EnemiesChamsTab = Chams:AddTab('Enemies') -- // Enemies Chams Right Tab Box
+local TeamChamsTab = Chams:AddTab('Team') --       // Team Chams Right Tab Box
+local LocalChamsTab = Chams:AddTab('Local') --     // Local Chams Right Tab Box
 local Glow = Tabs.Visual:AddLeftGroupbox('Glow') --        // Glow Left Group box
 
 -- // Anti-Aim
@@ -54,52 +54,70 @@ local FakeLag = Tabs.AntiAim:AddRightGroupbox("Fake Lag") -- make fake lag
 local Misc = Tabs.Misc:AddLeftGroupbox("Misc") -- idk
 local MiscPlayer = Tabs.Misc:AddRightGroupbox("Player")
 local FakeLatency = Tabs.Misc:AddRightGroupbox("Fake Latency/Ping")
+
+local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
 ------------------------------------------------------------------------
+--// Services
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+--// Variables
+
+local Camera = workspace.CurrentCamera
+-- local RayIgnore = workspace.Ray_Ignore
+local LocalPlayer = Players.LocalPlayer
+
+------------------------------------------------------------------------
+
+-- FOV Ring
+local FOVring = Drawing.new("Circle")
+FOVring.Visible = false
+FOVring.Thickness = 1.5
+FOVring.Radius = 150
+FOVring.Transparency = 1
+FOVring.Color = Color3.fromRGB(200, 200, 200)
+
+-- Aim Settings
+local AimSettings = {
+    Enabled = false,
+    TeamCheck = false,
+    Smoothing = 1,
+    EnableFOV = false,
+    FOV = 150
+}
 Aimbot:AddToggle('Aimbot', {Text = 'Aimbot', Default = false, Callback = function(Value)
-    print('n')
+    AimSettings.Enabled = Value
+    if Value then
+        FOVring.Visible = AimSettings.EnableFOV
+    else
+        FOVring.Visible = false
+    end
 end})
 Aimbot:AddToggle('Aimbot', {Text = 'Toggle', Default = false, Callback = function(Value)
     print('n')
+end})
+Aimbot:AddSlider('Smoothing', {Text = 'Smoothing', Min = 0, Max = 10, Default = 1, Rounding = 1, Compact = false, Callback = function(Value)
+    AimSettings.Smoothing = Value
 end})
 Aimbot:AddDivider()
 Aimbot:AddDropdown('AimbotTypeDropdown', {Values = { 'Camera', 'Mouse' }, Default = 1, Multi = false, Text = 'Aimbot Type', Tooltip = 'Choose the Aim Type', Callback = function(Value)
     AimbotType = Value
 end})
 Options.AimbotTypeDropdown:SetValue('Camera')
-Aimbot:AddDropdown('MyMultiDropdown', { Values = { 'Wall', 'Alive', 'Team', 'Whitelist' }, Default = 1, Multi = true, Text = 'Checkers', Tooltip = 'This will make the Aim dont work if player has something that is checked', Callback = function(Value)
-    print('n')
+Aimbot:AddDropdown('Checkers', {Values = { 'Wall', 'Alive', 'Team', 'Whitelist' }, Default = 1, Multi = true, Text = 'Checkers', Tooltip = 'This will make the Aim dont work if player has something that is checked', Callback = function(Value)
+    if Team then
+        AimSettings.TeamCheck = Value
+    end
 end})
-Options.MyMultiDropdown:SetValue({Wall = true, Alive = true, Team = true, Whitelist = false})
+Options.Checkers:SetValue({Wall = true, Alive = true, Team = true, Whitelist = false})
 
 Aimbot:AddDropdown('WhitelistPlayerDropdown', {SpecialType = 'Player', Text = 'Whitelist Players', Tooltip = 'Choose players to be whitelisted', Callback = function(Value)
     -- tablet.insert(SavedWhitelistTable)
 end})
-
--- Label:AddColorPicker
--- Arguments: Idx, Info
-
--- You can also ColorPicker & KeyPicker to a Toggle as well
-
-LeftGroupBox:AddLabel('Color'):AddColorPicker('ColorPicker', {
-    Default = Color3.new(0, 1, 0), -- Bright green
-    Title = 'Some color', -- Optional. Allows you to have a custom color picker title (when you open it)
-    Transparency = 0, -- Optional. Enables transparency changing for this color picker (leave as nil to disable)
-
-    Callback = function(Value)
-        print('[cb] Color changed!', Value)
-    end
-})
-
-Options.ColorPicker:OnChanged(function()
-    print('Color changed!', Options.ColorPicker.Value)
-    print('Transparency changed!', Options.ColorPicker.Transparency)
-end)
-
-Options.ColorPicker:SetValueRGB(Color3.fromRGB(0, 255, 140))
-
--- Label:AddKeyPicker
--- Arguments: Idx, Info
-
 Aimbot:AddLabel('Aim Keybind'):AddKeyPicker('AimKeybind', {
     Default = 'MB2',
     SyncToggleState = false,
@@ -115,17 +133,34 @@ Aimbot:AddLabel('Aim Keybind'):AddKeyPicker('AimKeybind', {
     end
 })
 Aimbot:AddLabel('Modes: Always, Toggle, Hold')
+Options.AimKeybind:SetValue({ 'MB2', 'Hold' }) -- Sets keybind to MB2, mode to Hold
 
--- OnClick is only fired when you press the keybind and the mode is Toggle
--- Otherwise, you will have to use Keybind:GetState()
-Options.KeyPicker:OnClick(function()
-    print('Keybind clicked!', Options.KeyPicker:GetState())
-end)
+RPlayer:AddToggle('SpinBot', {Text = 'Spinbot', Default = false, callback = function(v)
+    SpinbotEnabled = v
+    while SpinbotEnabled do
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.Humanoid.AutoRotate = false
+            LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinbotSpeed), 0)
+        else
+            LocalPlayer.Character.Humanoid.AutoRotate = true
+        end
+        task.wait()
+    end
+end})
+RPlayer:AddSlider('SpinbotSpeed', { Text = 'Spinbot Speed', Default = 30, Min = 0, Max = 100, Rounding = 1, Compact = false, Callback = function(Value)
+    SpinbotSpeed = Value
+end})
 
-Options.KeyPicker:OnChanged(function()
-    print('Keybind changed!', Options.KeyPicker.Value)
-end)
-Options.KeyPicker:SetValue({ 'MB2', 'Toggle' }) -- Sets keybind to MB2, mode to Hold
+LFov:AddToggle('EnableFOV', {Text = 'Enable FOV', Default = false, Callback = function(Value)
+    AimSettings.EnableFOV = Value
+    if AimSettings.Enabled then
+        FOVring.Visible = Value
+    end
+end})
+LFov:AddSlider('FOV', {Text = 'FOV', Min = 50, Max = 300, Default = 150, Callback = function(Value)
+    AimSettings.FOV = Value
+    FOVring.Radius = Value
+end})
 
 
 Library:SetWatermarkVisibility(true)
@@ -142,12 +177,8 @@ Library:OnUnload(function()
     Library.Unloaded = true
 end)
 
--- UI Settings
-local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
-
--- I set NoUI so it does not show up in the keybinds menu
 MenuGroup:AddButton('Unload', function() Library:Unload() end)
-MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'Insert', NoUI = true, Text = 'Menu keybind' })
+MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'End', NoUI = true, Text = 'Menu keybind' })
 
 Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
 MenuGroup:AddToggle('Keybinds', {Text = 'Keybinds', Default = true, Callback = function(Value)
