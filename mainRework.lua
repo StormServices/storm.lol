@@ -19,7 +19,7 @@ local Tabs = {
     Rage = Window:AddTab(" Rage "),
     Visual = Window:AddTab(" Visual "),
     AntiAim = Window:AddTab(" Anti-Aim "),
-    Fun = Window:AddTab(" Fun "),
+    -- Fun = Window:AddTab(" Fun "),
     Misc = Window:AddTab(" Misc "),
     ['UI Settings'] = Window:AddTab('UI Settings'),
 }
@@ -37,13 +37,13 @@ local RPlayer = Tabs.Rage:AddRightGroupbox("Player") -- make fly
 
 -- // Visuals
 local Esp = Tabs.Visual:AddLeftTabbox() --                 // Add ESP Left Tab Box
-local EnemiesEspTab = Esp:AddTab('Enemies') --       // Enemies ESP Left Tab Box
-local TeamEspTab = Esp:AddTab('Team') --             // Team ESP Left Tab Box
-local LocalEspTab = Esp:AddTab('Local') --           // Local ESP Left Tab Box
+local EnemiesEspTab = Esp:AddTab('Enemies') --             // Enemies ESP Left Tab Box
+local TeamEspTab = Esp:AddTab('Team') --                   // Team ESP Left Tab Box
+local LocalEspTab = Esp:AddTab('Local') --                 // Local ESP Left Tab Box
 local Chams = Tabs.Visual:AddRightTabbox() --              // Add Chams Right Tab Box
-local EnemiesChamsTab = Chams:AddTab('Enemies') -- // Enemies Chams Right Tab Box
-local TeamChamsTab = Chams:AddTab('Team') --       // Team Chams Right Tab Box
-local LocalChamsTab = Chams:AddTab('Local') --     // Local Chams Right Tab Box
+local EnemiesChamsTab = Chams:AddTab('Enemies') --         // Enemies Chams Right Tab Box
+local TeamChamsTab = Chams:AddTab('Team') --               // Team Chams Right Tab Box
+local LocalChamsTab = Chams:AddTab('Local') --             // Local Chams Right Tab Box
 local Glow = Tabs.Visual:AddLeftGroupbox('Glow') --        // Glow Left Group box
 
 -- // Anti-Aim
@@ -84,11 +84,14 @@ FOVring.Color = Color3.fromRGB(200, 200, 200)
 -- Aim Settings
 local AimSettings = {
     Enabled = false,
+    WallCheck = false,
     TeamCheck = false,
+    WhitelistCheck = false,
     Smoothing = 1,
     EnableFOV = false,
     FOV = 150
 }
+
 Aimbot:AddToggle('Aimbot', {Text = 'Aimbot', Default = false, Callback = function(Value)
     AimSettings.Enabled = Value
     if Value then
@@ -97,27 +100,24 @@ Aimbot:AddToggle('Aimbot', {Text = 'Aimbot', Default = false, Callback = functio
         FOVring.Visible = false
     end
 end})
-Aimbot:AddToggle('Aimbot', {Text = 'Toggle', Default = false, Callback = function(Value)
-    print('n')
-end})
-Aimbot:AddSlider('Smoothing', {Text = 'Smoothing', Min = 0, Max = 10, Default = 1, Rounding = 1, Compact = false, Callback = function(Value)
+Aimbot:AddSlider('Smoothing', {Text = 'Smoothing', Min = 0, Max = 10, Default = 1, Rounding = 0, Callback = function(Value)
     AimSettings.Smoothing = Value
 end})
-Aimbot:AddDivider()
+
 Aimbot:AddDropdown('AimbotTypeDropdown', {Values = { 'Camera', 'Mouse' }, Default = 1, Multi = false, Text = 'Aimbot Type', Tooltip = 'Choose the Aim Type', Callback = function(Value)
     AimbotType = Value
 end})
-Options.AimbotTypeDropdown:SetValue('Camera')
+
 Aimbot:AddDropdown('Checkers', {Values = { 'Wall', 'Alive', 'Team', 'Whitelist' }, Default = 1, Multi = true, Text = 'Checkers', Tooltip = 'This will make the Aim dont work if player has something that is checked', Callback = function(Value)
-    if Team then
-        AimSettings.TeamCheck = Value
+    for k, v in pairs(Value) do
+        AimSettings[k .. 'Check'] = v
     end
 end})
-Options.Checkers:SetValue({Wall = true, Alive = true, Team = true, Whitelist = false})
 
 Aimbot:AddDropdown('WhitelistPlayerDropdown', {SpecialType = 'Player', Text = 'Whitelist Players', Tooltip = 'Choose players to be whitelisted', Callback = function(Value)
     -- tablet.insert(SavedWhitelistTable)
 end})
+
 Aimbot:AddLabel('Aim Keybind'):AddKeyPicker('AimKeybind', {
     Default = 'MB2',
     SyncToggleState = false,
@@ -132,24 +132,6 @@ Aimbot:AddLabel('Aim Keybind'):AddKeyPicker('AimKeybind', {
         print('[cb] Keybind changed!', New)
     end
 })
-Aimbot:AddLabel('Modes: Always, Toggle, Hold')
-Options.AimKeybind:SetValue({ 'MB2', 'Hold' }) -- Sets keybind to MB2, mode to Hold
-
-RPlayer:AddToggle('SpinBot', {Text = 'Spinbot', Default = false, callback = function(v)
-    SpinbotEnabled = v
-    while SpinbotEnabled do
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.Humanoid.AutoRotate = false
-            LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinbotSpeed), 0)
-        else
-            LocalPlayer.Character.Humanoid.AutoRotate = true
-        end
-        task.wait()
-    end
-end})
-RPlayer:AddSlider('SpinbotSpeed', { Text = 'Spinbot Speed', Default = 30, Min = 0, Max = 100, Rounding = 1, Compact = false, Callback = function(Value)
-    SpinbotSpeed = Value
-end})
 
 LFov:AddToggle('EnableFOV', {Text = 'Enable FOV', Default = false, Callback = function(Value)
     AimSettings.EnableFOV = Value
@@ -157,9 +139,26 @@ LFov:AddToggle('EnableFOV', {Text = 'Enable FOV', Default = false, Callback = fu
         FOVring.Visible = Value
     end
 end})
+
 LFov:AddSlider('FOV', {Text = 'FOV', Min = 50, Max = 300, Default = 150, Callback = function(Value)
     AimSettings.FOV = Value
     FOVring.Radius = Value
+end})
+
+RPlayer:AddToggle('SpinBot', {Text = 'Spinbot', Default = false, callback = function(v)
+    SpinbotEnabled = v
+    while SpinbotEnabled == true do
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            game.Players.LocalPlayer.Character.Humanoid.AutoRotate = false
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinbotSpeed), 0)
+        else
+            game.Players.LocalPlayer.Character.Humanoid.AutoRotate = true
+        end
+        task.wait()
+    end
+end})
+RPlayer:AddSlider('SpinbotSpeedd', {Text = 'Spinbot Speed', Default = 30, Min = 0, Max = 100, Rounding = 1, Compact = false, Callback = function(Value)
+    SpinbotSpeed = Value
 end})
 
 
@@ -191,8 +190,8 @@ SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
 
-ThemeManager:SetFolder('MyScriptHub')
-SaveManager:SetFolder('MyScriptHub/specific-game')
+ThemeManager:SetFolder('storm.lol')
+SaveManager:SetFolder('storm.lol')
 
 SaveManager:BuildConfigSection(Tabs['UI Settings'])
 

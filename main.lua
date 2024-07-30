@@ -287,7 +287,7 @@ LPlayer:AddList({enabled = true, text = "Reset method", tooltip = "HP - Will dec
     resetMethod = v
 end})
 
-RPlayer:AddToggle({text = "Bhop", state = false, risky = false, tooltip = "Enable or disable Spinbot.", flag = "Spinbot", callback = function()
+RPlayer:AddToggle({text = "Bhop", state = false, risky = false, tooltip = "Enable or disable Bhop.", flag = "Spinbot", callback = function()
     if v == true then
         if LocalPlayer.Character ~= nil and UserInputService:IsKeyDown(Enum.KeyCode.Space) and LocalPlayer.PlayerGui.GUI.Main.GlobalChat.Visible == false then
             LocalPlayer.Character.Humanoid.Jump = true
