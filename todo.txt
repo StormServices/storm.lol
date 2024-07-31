@@ -1,0 +1,13 @@
+1. Name Esp
+2. Chams
+3. Fix aimbot + Fov
+4. Triggerbot
+5. World changer
+    - Saturation, Brightness, Coloration, Skybox
+6. Custom crosshair
+    - Animated Crosshair, '+' Crosshair on mid screen
+7. Box Esp
+8. Health bar ( Possible dropdown: Left, Right, Above Head, Down)
+    - Dropdown colormode: based on health, or customizable
+9. Hp text
+    - Dropdown: On Bar, Above Head, Down

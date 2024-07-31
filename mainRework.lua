@@ -1,11 +1,9 @@
--- New example script written by wally
--- You can suggest changes with a pull request or something
-
 local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
 
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/StormServices/storm.lol/main/loadAssets.lua'))()
 
 local Window = Library:CreateWindow({
     Title = 'storm.lol',
@@ -249,6 +247,8 @@ end
 
 EnemiesEspTab:AddToggle('EnableEsp', {Text = 'Enable Esp', Default = false, callback = function(v)
     EspSettings.EspEnabled = v
+    if EspSettings.EspEnabled == false then
+    end
 end})
 
 EnemiesEspTab:AddToggle('LineEsp', {Text = 'Tracer / Lines', Default = false, callback = function(v)
@@ -262,7 +262,7 @@ EnemiesEspTab:AddToggle('NameEsp', {Text = 'Name', Default = false, callback = f
             end
         end
         ps.PlayerAdded:Connect(p_added)
-    end
+    else wait until EspSettings.EspEnabled == true end
 end})
 EnemiesEspTab:AddToggle('BoxEsp', {Text = 'Box', Default = false, callback = function(v)
     EspSettings.tracers = v   
