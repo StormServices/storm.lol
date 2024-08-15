@@ -1,4 +1,3 @@
-function createCBtab()
 local Guns = Tab5:AddSection("Guns Modif", 3)
 local CbVisuals = Tab5:AddSection("Visuals", 4)
 
